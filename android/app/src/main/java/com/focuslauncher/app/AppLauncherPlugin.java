@@ -1,0 +1,70 @@
+package com.focuslauncher.app;
+
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+
+import com.getcapacitor.JSArray;
+import com.getcapacitor.JSObject;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.PluginMethod;
+
+import java.util.List;
+
+@CapacitorPlugin(name = "AppLauncherCustom")
+public class AppLauncherPlugin extends Plugin {
+
+    @PluginMethod
+    public void getInstalledApps(PluginCall call) {
+        try {
+            PackageManager pm = getContext().getPackageManager();
+
+            Intent intent = new Intent(Intent.ACTION_MAIN, null);
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+
+            List<ResolveInfo> apps = pm.queryIntentActivities(intent, 0);
+
+            JSArray appList = new JSArray();
+
+            for (ResolveInfo app : apps) {
+                JSObject obj = new JSObject();
+                obj.put("appName", app.loadLabel(pm).toString());
+                obj.put("packageName", app.activityInfo.packageName);
+                appList.put(obj);
+            }
+
+            JSObject result = new JSObject();
+            result.put("apps", appList);
+
+            call.resolve(result);
+
+        } catch (Exception e) {
+            call.reject(e.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void openApp(PluginCall call) {
+        String packageName = call.getString("packageName");
+
+        if (packageName == null) {
+            call.reject("Package name missing");
+            return;
+        }
+
+        Intent intent = getContext()
+                .getPackageManager()
+                .getLaunchIntentForPackage(packageName);
+
+        if (intent == null) {
+            call.reject("App not found");
+            return;
+        }
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(intent);
+        call.resolve();
+    }
+}
