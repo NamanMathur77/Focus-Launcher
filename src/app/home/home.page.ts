@@ -1,14 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
+import { RouterLink } from '@angular/router';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonButtons, IonButton } from '@ionic/angular/standalone';
 import { Capacitor } from '@capacitor/core';
 import { AppLauncher, InstalledApp } from '../native/app-launcher';
+import { Preferences } from '@capacitor/preferences';
+import { RouterLinkActive } from "@angular/router";
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [CommonModule, IonHeader, IonToolbar, IonTitle, IonContent],
+  imports: [CommonModule, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonList, IonLabel, IonButtons, IonButton, RouterLinkActive],
   standalone: true,
 })
 export class HomePage implements OnInit {
@@ -17,25 +20,24 @@ export class HomePage implements OnInit {
   failedToLoadApps = false;
 
   async ngOnInit() {
-    // Don't call native plugins when running in the browser (ionic serve)
-    if (Capacitor.getPlatform() === 'web') {
-      console.log('Running on web — skipping AppLauncher plugin');
-      this.apps = [];
-      return;
-    }
-    try {
-      const result = await AppLauncher.getInstalledApps();
-      // Some native plugin implementations may return JSObject/JSONArray wrappers
-      // Normalize to a plain array before assigning to the template-bound variable
-      this.apps = Array.isArray(result?.apps) ? result.apps : [];
-      console.log('Installed apps:', this.apps);
-    } catch (err) {
-      // Log errors so they show up in logcat / remote debugger instead of failing silently
-      console.error('Failed to get installed apps:', err);
-      this.apps = [];
-      this.failedToLoadApps = true;
+    if (Capacitor.getPlatform() === 'web') return;
 
-    }
+      const result = await AppLauncher.getInstalledApps();
+      console.log('Installed apps retrieved:', result.apps.length);
+      const allApps = result.apps;
+
+      const saved = await Preferences.get({ key: 'selectedApps' });
+
+      if (!saved.value) {
+        this.apps = [];
+        return;
+      }
+
+      const allowed = new Set<string>(JSON.parse(saved.value));
+
+      this.apps = allApps.filter(app =>
+        allowed.has(app.packageName)
+      );
 
     console.log('HomePage loaded');
   }

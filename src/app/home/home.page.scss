@@ -1,25 +1,26 @@
-.launcher {
-  height: 100%;
-  background: black;
-  color: #ededed;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
+ion-content{
+  --background: #000000;
+
+  ion-buttons{
+    ion-button{
+      --color: #ffffff;
+    }
+  }
+
+  ion-list {
+  background: transparent;
+
+    ion-item {
+      --background: transparent;
+      --color: #ffffff;
+      --border-color: #111;
+
+      ion-label h2 {
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 500;
+      }
+    }
+  }
 }
 
-.time {
-  font-size: 48px;
-  font-weight: 200;
-  margin-bottom: 40px;
-}
-
-.apps {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.app {
-  font-size: 22px;
-  font-weight: 400;
-}
