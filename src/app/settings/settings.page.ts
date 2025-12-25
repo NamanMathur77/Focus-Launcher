@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonCheckbox, IonList, IonLabel, IonButton } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonCheckbox, IonList, IonLabel, IonButton, IonFooter } from '@ionic/angular/standalone';
 import { AppLauncher, InstalledApp } from '../native/app-launcher';
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from '@capacitor/core';
+import { AppState } from '../services/app-state';
 
 @Component({
   selector: 'app-settings',
@@ -19,35 +20,26 @@ import { Capacitor } from '@capacitor/core';
     IonCheckbox,
     IonList,
     IonLabel,
-    IonButton
-  ]
+    IonButton,
+    IonFooter
+]
 })
 export class SettingsPage implements OnInit {
 
-  apps: InstalledApp[] = [];
-  selectedApps = new Set<string>();
+  apps$ = this.appState.installedApps$;
+  selected$ = this.appState.selectedApps$;
+
+  constructor(private appState: AppState) { }
 
   async ngOnInit() {
     console.log('SettingsPage loaded');
     if (Capacitor.getPlatform() === 'web') return;
 
-    const saved = await Preferences.get({ key: 'selectedApps' });
-    if (saved.value) {
-      JSON.parse(saved.value).forEach((p: string) => this.selectedApps.add(p));
-    }
-
-    const result = await AppLauncher.getInstalledApps();
-    this.apps = result.apps;
+    this.appState.loadInstalledApps();
+    this.appState.loadSelectedApps();
   }
 
   toggleApp(pkg: string, checked: boolean) {
-    checked ? this.selectedApps.add(pkg) : this.selectedApps.delete(pkg);
-  }
-
-  async save() {
-    await Preferences.set({
-      key: 'selectedApps',
-      value: JSON.stringify([...this.selectedApps])
-    });
+    this.appState.toggleAppSelection(pkg, checked);
   }
 }

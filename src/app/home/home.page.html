@@ -11,20 +11,15 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-
-  <!-- Error state -->
-  <ion-item *ngIf="failedToLoadApps" color="danger">
-    <ion-label>Failed to load installed apps</ion-label>
-  </ion-item>
+<ion-content>
 
   <!-- Empty state -->
-  <ion-item *ngIf="!failedToLoadApps && apps.length === 0">
+  <ion-item *ngIf="!(apps$ | async)?.length">
     <ion-label>No apps found</ion-label>
   </ion-item>
 
   <!-- App list -->
-  <ion-list *ngIf="apps.length > 0">
+  <ion-list *ngIf="apps$ | async as apps">
     <ion-item
       button
       *ngFor="let app of apps"

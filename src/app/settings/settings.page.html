@@ -1,25 +1,29 @@
+<!-- TOP SAFE AREA -->
 <ion-header>
   <ion-toolbar>
     <ion-title>Select Apps</ion-title>
   </ion-toolbar>
 </ion-header>
 
+<!-- SCROLLABLE CONTENT -->
 <ion-content>
 
-  <ion-list>
+  <ion-list *ngIf="(apps$ | async) as apps">
     <ion-item *ngFor="let app of apps">
       <ion-label>{{ app.appName }}</ion-label>
 
       <ion-checkbox
         slot="end"
-        [checked]="selectedApps.has(app.packageName)"
+        [checked]="(selected$ | async)?.has(app.packageName)"
         (ionChange)="toggleApp(app.packageName, $event.detail.checked)"
       ></ion-checkbox>
     </ion-item>
   </ion-list>
 
-  <ion-button expand="block" (click)="save()">
-    Save Selection
-  </ion-button>
-
 </ion-content>
+
+<!-- FIXED BOTTOM BUTTON -->
+<ion-footer>
+  <ion-toolbar>
+  </ion-toolbar>
+</ion-footer>

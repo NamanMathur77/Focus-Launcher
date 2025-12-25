@@ -1,0 +1,27 @@
+ion-content {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  /* reserve space for fixed footer; include fallback for devices with 3-button nav */
+  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
+}
+
+ion-footer {
+  /* place footer above system nav (fixed) and give it a large z-index */
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  z-index: 9999;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+ion-footer ion-toolbar {
+  /* add some extra internal padding so the button clears the nav bar */
+  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+ion-footer ion-button {
+  /* ensure visible tap target above system nav; no extra margin needed with footer offset */
+  margin-bottom: 0;
+}

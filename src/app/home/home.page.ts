@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core';
 import { AppLauncher, InstalledApp } from '../native/app-launcher';
 import { Preferences } from '@capacitor/preferences';
 import { RouterLinkActive } from "@angular/router";
+import { AppState } from '../services/app-state';
 
 @Component({
   selector: 'app-home',
@@ -16,28 +17,17 @@ import { RouterLinkActive } from "@angular/router";
 })
 export class HomePage implements OnInit {
 
-  apps: InstalledApp[] = [];
+  apps$ = this.appState.visibleApps$;
   failedToLoadApps = false;
+
+  constructor(private appState: AppState) {
+  }
 
   async ngOnInit() {
     if (Capacitor.getPlatform() === 'web') return;
 
-      const result = await AppLauncher.getInstalledApps();
-      console.log('Installed apps retrieved:', result.apps.length);
-      const allApps = result.apps;
-
-      const saved = await Preferences.get({ key: 'selectedApps' });
-
-      if (!saved.value) {
-        this.apps = [];
-        return;
-      }
-
-      const allowed = new Set<string>(JSON.parse(saved.value));
-
-      this.apps = allApps.filter(app =>
-        allowed.has(app.packageName)
-      );
+    await this.appState.loadInstalledApps();
+    await this.appState.loadSelectedApps();
 
     console.log('HomePage loaded');
   }
