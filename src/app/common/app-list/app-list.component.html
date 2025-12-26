@@ -1,0 +1,17 @@
+<ion-list class="apps-list">
+  <ion-item
+    *ngFor="let app of apps"
+    button
+    (click)="onClick(app)"
+  >
+    <ion-label>{{ app.appName }}</ion-label>
+
+    <ion-toggle
+      *ngIf="selectable"
+      slot="end"
+      class="focus-toggle"
+      [checked]="selected.has(app.packageName)"
+      (ionChange)="toggle(app.packageName, $event.detail.checked, $event)"
+    ></ion-toggle>
+  </ion-item>
+</ion-list>

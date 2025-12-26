@@ -5,6 +5,8 @@ import { AppLauncher, InstalledApp } from '../native/app-launcher';
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from '@capacitor/core';
 import { AppState } from '../services/app-state';
+import { ToastController } from '@ionic/angular/standalone';
+import { AppListComponent } from "../common/app-list/app-list.component";
 
 @Component({
   selector: 'app-settings',
@@ -21,15 +23,17 @@ import { AppState } from '../services/app-state';
     IonList,
     IonLabel,
     IonButton,
-    IonFooter
+    IonFooter,
+    AppListComponent
 ]
 })
 export class SettingsPage implements OnInit {
 
   apps$ = this.appState.installedApps$;
   selected$ = this.appState.selectedApps$;
+  emptySet: Set<string> = new Set<string>();
 
-  constructor(private appState: AppState) { }
+  constructor(private appState: AppState, private toastCtrl: ToastController) { }
 
   async ngOnInit() {
     console.log('SettingsPage loaded');
@@ -39,7 +43,55 @@ export class SettingsPage implements OnInit {
     this.appState.loadSelectedApps();
   }
 
-  toggleApp(pkg: string, checked: boolean) {
-    this.appState.toggleAppSelection(pkg, checked);
+  async toggleApp(pkg: string, checked: boolean) {
+    const ok = await this.appState.toggleAppSelection(pkg, checked);
+    if (!ok) {
+      const t = await this.toastCtrl.create({
+        message: 'Only 7 apps can be selected',
+        duration: 2000,
+        color: 'danger',
+        position: 'top'
+      });
+      await t.present();
+    }
+  }
+
+  async setSelection(next: Set<string>) {
+    if (next.size > 7) {
+      const t = await this.toastCtrl.create({
+        message: 'Only 7 apps can be selected',
+        duration: 2000,
+        color: 'danger',
+        position: 'top'
+      });
+      await t.present();
+      return;
+    }
+
+    await this.appState.setSelectedApps(next);
+  }
+
+  async onToggleRequest(event: { pkg: string; checked: boolean; event?: Event }) {
+    const ok = await this.appState.toggleAppSelection(event.pkg, event.checked);
+    if (!ok) {
+      // revert the toggle element visually since the selection was rejected
+      try {
+        const target = (event.event as any)?.target;
+        if (target && 'checked' in target) {
+          // reset to false
+          target.checked = false;
+        }
+      } catch (e) {
+        // ignore DOM errors
+      }
+
+      const t = await this.toastCtrl.create({
+        message: 'Only 7 apps can be selected',
+        duration: 2000,
+        color: 'danger',
+        position: 'top'
+      });
+      await t.present();
+    }
   }
 }

@@ -35,3 +35,63 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+ion-content {
+  --background: #000000;
+}
+
+ion-list {
+  --background: black;
+  background-color: #000000;
+}
+
+ion-toggle.focus-toggle {
+  width: 42px;
+  height: 22px;
+}
+
+ion-toggle.focus-toggle::part(track) {
+  border-radius: 12px;
+  background: #cfcfcf;
+}
+
+ion-toggle.focus-toggle.toggle-checked::part(track) {
+  background: #4caf50;
+}
+
+ion-toggle.focus-toggle::part(handle) {
+  width: 18px;
+  height: 18px;
+  background: white;
+}
+
+.title-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: calc(56px + var(--ion-safe-area-top));
+  padding-top: var(--ion-safe-area-top);
+  padding-left: 16px;
+  padding-right: 16px;
+
+  background: #000;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  font-size: 2rem;
+  justify-content: space-between;
+
+  z-index: 100;
+}
+
+ion-content.setting-list-container {
+    margin-bottom: 30px;
+    --padding-top: calc(56px + var(--ion-safe-area-top));
+}
+
+ion-content.home-apps-container{
+    --padding-top: calc(56px + var(--ion-safe-area-top));
+}

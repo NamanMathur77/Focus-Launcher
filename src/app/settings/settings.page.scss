@@ -1,8 +1,48 @@
-ion-content {
-  --padding-start: 8px;
-  --padding-end: 8px;
-  /* reserve space for fixed footer; include fallback for devices with 3-button nav */
-  --padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
+ion-header {
+  background: #000000 !important;
+}
+
+.ion-toolbar{
+    --background: #000000 !important;
+    background: #000000 !important;
+}
+
+ion-toolbar.settings-header {
+  --background: #000000;
+  --color: #ffffff;
+  --border-width: 0;
+}
+
+ion-title {
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+
+:host ::ng-deep .title-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: calc(56px + var(--ion-safe-area-top));
+  padding-top: var(--ion-safe-area-top);
+  padding-left: 16px;
+  padding-right: 16px;
+
+  background: #000;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+
+  z-index: 100;
+}
+
+
+ion-content.setting-list-container {
+    --background: #000;
+    margin-bottom: 30px;
+    --padding-top: calc(56px + var(--ion-safe-area-top));
 }
 
 ion-footer {

@@ -1,17 +1,13 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Focus Launcher</ion-title>
+<div class="title-header">
+  <span> </span>
+  <span
+    class="material-icons settings-icon"
+    [routerLink]="'/settings'">
+    settings
+  </span>
+</div>
 
-    <ion-buttons slot="end">
-      <ion-button routerLink="/settings">
-        Settings
-      </ion-button>
-    </ion-buttons>
-
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
+<ion-content class="home-apps-container">
 
   <!-- Empty state -->
   <ion-item *ngIf="!(apps$ | async)?.length">

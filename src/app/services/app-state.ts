@@ -37,18 +37,44 @@ export class AppState {
     }
   }
 
-  async toggleAppSelection(pkg: string, selected: boolean) {
+  /**
+   * Toggle selection for a single package.
+   * Returns true if the operation succeeded, false if it was rejected
+   * (e.g., selection limit reached).
+   */
+  async toggleAppSelection(pkg: string, selected: boolean): Promise<boolean> {
     const currentSelection = this.selectedAppsSubject.getValue();
+
     if (selected) {
+      // enforce max 7 apps
+      if (currentSelection.size >= 7) {
+        return false;
+      }
       currentSelection.add(pkg);
     } else {
       currentSelection.delete(pkg);
     }
+
     this.selectedAppsSubject.next(currentSelection);
 
     await Preferences.set({
       key: 'selectedApps',
       value: JSON.stringify([...currentSelection])
+    });
+
+    return true;
+  }
+
+  /**
+   * Replace the selected apps set atomically and persist it.
+   */
+  async setSelectedApps(next: Set<string>) {
+    // store a new Set to avoid accidental external mutation
+    this.selectedAppsSubject.next(new Set(next));
+
+    await Preferences.set({
+      key: 'selectedApps',
+      value: JSON.stringify([...next])
     });
   }
 }
