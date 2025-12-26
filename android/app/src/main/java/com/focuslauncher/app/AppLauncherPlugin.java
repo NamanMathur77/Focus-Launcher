@@ -67,4 +67,21 @@ public class AppLauncherPlugin extends Plugin {
         getContext().startActivity(intent);
         call.resolve();
     }
+
+        @PluginMethod
+        public void openLauncherChooser(PluginCall call) {
+            try {
+                // Open the Home (default launcher) settings screen so the user can
+                // choose the default launcher. This is preferable to simply launching
+                // the HOME intent which immediately goes to the home screen and
+                // backgrounds the app.
+                Intent intent = new Intent(android.provider.Settings.ACTION_HOME_SETTINGS);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                getContext().startActivity(intent);
+                call.resolve();
+            } catch (Exception e) {
+                call.reject("Failed to open launcher chooser", e);
+            }
+        }
 }
