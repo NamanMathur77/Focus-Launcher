@@ -1,16 +1,31 @@
 <!-- TOP SAFE AREA -->
 <div class="title-header">
-  <span>Select Apps</span>
+  <span>Settings</span>
 </div>
 <!-- SCROLLABLE CONTENT -->
 <ion-content class="setting-list-container">
 
-  <app-app-list
-    [apps]="(apps$ | async) || []"
-    [selectable]="true"
-    [selected]="(selected$ | async) || emptySet"
-    (selectionChange)="setSelection($event)"
-    (toggleRequest)="onToggleRequest($event)"
-  ></app-app-list>
+  <!-- Collapsible selector -->
+  <ion-item class="select-apps-collapse-btn" button lines="none" detail="false" (click)="showApps = !showApps">
+    <ion-label>
+      <h2>Select Apps</h2>
+      <p *ngIf="(countAndLimit$ | async) as cl">{{cl.cnt}} / {{cl.lim}} selected</p>
+    </ion-label>
+    <ion-button fill="clear" slot="end">{{ showApps ? 'Hide' : 'Show' }}</ion-button>
+  </ion-item>
+
+  <div *ngIf="showApps" class="selector-list">
+    <ion-item class="select-max-apps-allowed-container" lines="none">
+      <ion-label>Max selections</ion-label>
+        <ion-input slot="end" class="limit-input" type="number" min="1" [value]="(selectionLimit$ | async)" inputmode="numeric" (ionChange)="onLimitChange($event)" placeholder="N"></ion-input>
+    </ion-item>
+    <app-app-list
+      [apps]="(apps$ | async) || []"
+      [selectable]="true"
+      [selected]="(selected$ | async) || emptySet"
+      (selectionChange)="setSelection($event)"
+      (toggleRequest)="onToggleRequest($event)"
+    ></app-app-list>
+  </div>
 
 </ion-content>

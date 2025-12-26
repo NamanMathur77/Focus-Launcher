@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonCheckbox, IonList, IonLabel, IonButton, IonFooter } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonCheckbox, IonList, IonLabel, IonButton, IonFooter, IonInput } from '@ionic/angular/standalone';
 import { AppLauncher, InstalledApp } from '../native/app-launcher';
 import { Preferences } from '@capacitor/preferences';
 import { Capacitor } from '@capacitor/core';
 import { AppState } from '../services/app-state';
+import { map } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 import { ToastController } from '@ionic/angular/standalone';
 import { AppListComponent } from "../common/app-list/app-list.component";
 
@@ -20,6 +22,7 @@ import { AppListComponent } from "../common/app-list/app-list.component";
     IonTitle,
     IonItem,
     IonCheckbox,
+    IonInput,
     IonList,
     IonLabel,
     IonButton,
@@ -32,6 +35,12 @@ export class SettingsPage implements OnInit {
   apps$ = this.appState.installedApps$;
   selected$ = this.appState.selectedApps$;
   emptySet: Set<string> = new Set<string>();
+  selectedCount$ = this.selected$.pipe(map(s => s.size));
+  showApps = false;
+  selectionLimit$ = this.appState.selectionLimit$;
+  countAndLimit$ = combineLatest([this.selected$, this.selectionLimit$]).pipe(
+    map(([s, lim]) => ({ cnt: s.size, lim }))
+  );
 
   constructor(private appState: AppState, private toastCtrl: ToastController) { }
 
@@ -41,6 +50,7 @@ export class SettingsPage implements OnInit {
 
     this.appState.loadInstalledApps();
     this.appState.loadSelectedApps();
+    this.appState.loadSelectionLimit();
   }
 
   async toggleApp(pkg: string, checked: boolean) {
@@ -89,6 +99,41 @@ export class SettingsPage implements OnInit {
         message: 'Only 7 apps can be selected',
         duration: 2000,
         color: 'danger',
+        position: 'top'
+      });
+      await t.present();
+    }
+  }
+
+  async onLimitChange(ev: any) {
+    const raw = ev?.detail?.value ?? ev?.target?.value;
+    const val = Number(raw);
+    const requested = Number.isFinite(val) && val > 0 ? Math.floor(val) : 1;
+    // Service enforces [1,10], but let user know if they tried to exceed 10
+    const clamped = Math.min(10, Math.max(1, requested));
+
+    if (requested > 10) {
+      // reflect clamped value back into input
+      try {
+        if (ev?.detail) ev.detail.value = clamped;
+        if (ev?.target) (ev.target as any).value = clamped;
+      } catch (e) {}
+
+      const toast = await this.toastCtrl.create({
+        message: 'Maximum allowed is 10',
+        duration: 2000,
+        color: 'warning',
+        position: 'top'
+      });
+      await toast.present();
+    }
+
+    const res = await this.appState.setSelectionLimit(clamped);
+    if (res.trimmed) {
+      const t = await this.toastCtrl.create({
+        message: `Selection trimmed to ${clamped} apps`,
+        duration: 2000,
+        color: 'warning',
         position: 'top'
       });
       await t.present();

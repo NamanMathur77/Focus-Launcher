@@ -10,9 +10,9 @@
 <ion-content class="home-apps-container">
 
   <!-- Empty state -->
-  <ion-item *ngIf="!(apps$ | async)?.length">
-    <ion-label>No apps found</ion-label>
-  </ion-item>
+  <div *ngIf="!(apps$ | async)?.length" class="no-apps-container">
+    <ion-label>Please select the apps from settings</ion-label>
+  </div>
 
   <!-- App list -->
   <ion-list *ngIf="apps$ | async as apps">

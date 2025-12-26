@@ -95,3 +95,21 @@ ion-content.setting-list-container {
 ion-content.home-apps-container{
     --padding-top: calc(56px + var(--ion-safe-area-top));
 }
+
+ion-item.select-apps-collapse-btn{
+    --background: #1A1B21;
+    --color: white;
+    padding: 5px;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+
+ion-item.select-max-apps-allowed-container{
+    --background: #1A1B21;
+    --color: white;
+    padding: 5px;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: space-between;
+}
