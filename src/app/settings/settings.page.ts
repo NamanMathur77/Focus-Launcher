@@ -34,13 +34,17 @@ export class SettingsPage implements OnInit {
 
   apps$ = this.appState.installedApps$;
   selected$ = this.appState.selectedApps$;
+  restricted$ = this.appState.restrictedApps$;
   emptySet: Set<string> = new Set<string>();
   selectedCount$ = this.selected$.pipe(map(s => s.size));
   showApps = false;
+  showSelectedList = false;
+  showRestricted = false;
   selectionLimit$ = this.appState.selectionLimit$;
   countAndLimit$ = combineLatest([this.selected$, this.selectionLimit$]).pipe(
     map(([s, lim]) => ({ cnt: s.size, lim }))
   );
+  restrictedCount$ = this.restricted$.pipe(map(s => s.size));
 
   constructor(private appState: AppState, private toastCtrl: ToastController) { }
 
@@ -51,13 +55,15 @@ export class SettingsPage implements OnInit {
     this.appState.loadInstalledApps();
     this.appState.loadSelectedApps();
     this.appState.loadSelectionLimit();
+    this.appState.loadRestrictedApps();
   }
 
   async toggleApp(pkg: string, checked: boolean) {
     const ok = await this.appState.toggleAppSelection(pkg, checked);
     if (!ok) {
+      const lim = this.appState.getSelectionLimit();
       const t = await this.toastCtrl.create({
-        message: 'Only 7 apps can be selected',
+        message: `Only ${lim} apps can be selected`,
         duration: 2000,
         color: 'danger',
         position: 'top'
@@ -67,9 +73,10 @@ export class SettingsPage implements OnInit {
   }
 
   async setSelection(next: Set<string>) {
-    if (next.size > 7) {
+    const limit = this.appState.getSelectionLimit();
+    if (next.size > limit) {
       const t = await this.toastCtrl.create({
-        message: 'Only 7 apps can be selected',
+        message: `Only ${limit} apps can be selected`,
         duration: 2000,
         color: 'danger',
         position: 'top'
@@ -95,14 +102,32 @@ export class SettingsPage implements OnInit {
         // ignore DOM errors
       }
 
+      const lim = this.appState.getSelectionLimit();
       const t = await this.toastCtrl.create({
-        message: 'Only 7 apps can be selected',
+        message: `Only ${lim} apps can be selected`,
         duration: 2000,
         color: 'danger',
         position: 'top'
       });
       await t.present();
     }
+  }
+
+  // Restricted handlers
+  async onRestrictedToggle(event: { pkg: string; checked: boolean; event?: Event }) {
+    const ok = await this.appState.toggleRestrictedApp(event.pkg, event.checked);
+    if (!ok) {
+      try {
+        const target = (event.event as any)?.target;
+        if (target && 'checked' in target) {
+          target.checked = false;
+        }
+      } catch (e) {}
+    }
+  }
+
+  async setRestricted(next: Set<string>) {
+    await this.appState.setRestrictedApps(next);
   }
 
   async onLimitChange(ev: any) {

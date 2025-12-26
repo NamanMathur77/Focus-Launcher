@@ -10,10 +10,12 @@ import { Preferences } from '@capacitor/preferences';
 export class AppState {
   private installedAppsSubject  = new BehaviorSubject<InstalledApp[]>([]);
   private selectedAppsSubject  = new BehaviorSubject<Set<string>>(new Set());
+  private restrictedAppsSubject = new BehaviorSubject<Set<string>>(new Set());
   private selectionLimitSubject = new BehaviorSubject<number>(7);
 
   installedApps$ = this.installedAppsSubject.asObservable();
   selectedApps$ = this.selectedAppsSubject.asObservable();
+  restrictedApps$ = this.restrictedAppsSubject.asObservable();
 
   visibleApps$ = combineLatest([
     this.installedApps$,
@@ -24,6 +26,11 @@ export class AppState {
     );
 
   selectionLimit$ = this.selectionLimitSubject.asObservable();
+
+  /** Return the current selection limit synchronously. */
+  getSelectionLimit(): number {
+    return this.selectionLimitSubject.getValue();
+  }
 
   async loadInstalledApps(){
     if(Capacitor.getPlatform() === 'web') return;
@@ -37,6 +44,13 @@ export class AppState {
     const saved = await Preferences.get({ key: 'selectedApps' });
     if(saved.value) {
       this.selectedAppsSubject.next(new Set(JSON.parse(saved.value)));
+    }
+  }
+
+  async loadRestrictedApps(){
+    const saved = await Preferences.get({ key: 'restrictedApps' });
+    if (saved.value) {
+      this.restrictedAppsSubject.next(new Set(JSON.parse(saved.value)));
     }
   }
 
@@ -74,6 +88,20 @@ export class AppState {
     return true;
   }
 
+  /** Toggle a package in the restricted set. Always succeeds and returns true. */
+  async toggleRestrictedApp(pkg: string, restricted: boolean): Promise<boolean> {
+    const current = this.restrictedAppsSubject.getValue();
+    if (restricted) {
+      current.add(pkg);
+    } else {
+      current.delete(pkg);
+    }
+    this.restrictedAppsSubject.next(current);
+
+    await Preferences.set({ key: 'restrictedApps', value: JSON.stringify([...current]) });
+    return true;
+  }
+
   /**
    * Replace the selected apps set atomically and persist it.
    */
@@ -97,6 +125,13 @@ export class AppState {
     });
 
     return { trimmed, final };
+  }
+
+  /** Replace the restricted set and persist it. */
+  async setRestrictedApps(next: Set<string>) {
+    this.restrictedAppsSubject.next(new Set(next));
+    await Preferences.set({ key: 'restrictedApps', value: JSON.stringify([...next]) });
+    return { final: new Set(next) };
   }
 
   /**
