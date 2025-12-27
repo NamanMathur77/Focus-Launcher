@@ -91,3 +91,21 @@ ion-footer ion-button {
   /* ensure visible tap target above system nav; no extra margin needed with footer offset */
   margin-bottom: 0;
 }
+
+/* Make the alert occupy the full viewport so users cannot interact with the app */
+:host ::ng-deep .full-screen-alert .alert-wrapper {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  margin: 0;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:host ::ng-deep .full-screen-alert .alert-message {
+  text-align: center;
+  font-size: 18px;
+}

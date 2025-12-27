@@ -7,7 +7,7 @@ import { Capacitor } from '@capacitor/core';
 import { AppState } from '../services/app-state';
 import { map } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
-import { ToastController } from '@ionic/angular/standalone';
+import { ToastController, AlertController } from '@ionic/angular/standalone';
 import { AppListComponent } from "../common/app-list/app-list.component";
 
 @Component({
@@ -32,7 +32,7 @@ import { AppListComponent } from "../common/app-list/app-list.component";
 })
 export class SettingsPage implements OnInit {
 
-  apps$ = this.appState.installedApps$;
+  apps$ = this.appState.availableApps$;
   selected$ = this.appState.selectedApps$;
   restricted$ = this.appState.restrictedApps$;
   emptySet: Set<string> = new Set<string>();
@@ -45,8 +45,10 @@ export class SettingsPage implements OnInit {
     map(([s, lim]) => ({ cnt: s.size, lim }))
   );
   restrictedCount$ = this.restricted$.pipe(map(s => s.size));
+  // All installed apps (used for the Restricted Apps list so users can pick any app to restrict)
+  installed$ = this.appState.installedApps$;
 
-  constructor(private appState: AppState, private toastCtrl: ToastController) { }
+  constructor(private appState: AppState, private toastCtrl: ToastController, private alertCtrl: AlertController) { }
 
   async ngOnInit() {
     console.log('SettingsPage loaded');
@@ -115,19 +117,94 @@ export class SettingsPage implements OnInit {
 
   // Restricted handlers
   async onRestrictedToggle(event: { pkg: string; checked: boolean; event?: Event }) {
-    const ok = await this.appState.toggleRestrictedApp(event.pkg, event.checked);
-    if (!ok) {
-      try {
-        const target = (event.event as any)?.target;
-        if (target && 'checked' in target) {
-          target.checked = false;
-        }
-      } catch (e) {}
+    const pkg = event.pkg;
+    const requested = event.checked;
+
+    // If user is *restricting* an app, apply immediately
+    if (requested) {
+      await this.appState.toggleRestrictedApp(pkg, true);
+      return;
     }
+
+    // User is attempting to *unrestrict* an app: show a 10s popup with Undo
+    // Keep the toggle visually ON during the countdown and disable it to avoid
+    // race interactions.
+    let target: any = (event.event as any)?.target;
+    try {
+      if (target && 'checked' in target) {
+        // keep it checked while waiting
+        target.checked = true;
+        target.disabled = true;
+      }
+    } catch (e) {
+      target = undefined;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'Wait — think about it',
+      message: 'Unrestricting this app in 10 seconds. Press Undo to cancel.',
+      buttons: [
+        {
+          text: 'Undo',
+          role: 'cancel'
+        }
+      ],
+      backdropDismiss: false,
+      cssClass: 'full-screen-alert'
+    });
+
+    await alert.present();
+
+    // auto-dismiss after 10s if user doesn't press Undo
+    const timer = setTimeout(async () => {
+      try { await alert.dismiss(); } catch (e) {}
+    }, 10000);
+
+    const { role } = await alert.onDidDismiss();
+    clearTimeout(timer);
+
+    // Re-enable the toggle if we disabled it earlier
+    try {
+      if (target) target.disabled = false;
+    } catch (e) {}
+
+    if (role === 'cancel') {
+      // user cancelled the unrestrict — keep it restricted (no-op)
+      const t = await this.toastCtrl.create({
+        message: 'Action cancelled',
+        duration: 1500,
+        position: 'top'
+      });
+      await t.present();
+      return;
+    }
+
+    // timed out without undo — proceed to unrestrict
+    await this.appState.toggleRestrictedApp(pkg, false);
+    const done = await this.toastCtrl.create({
+      message: 'App unrestricted',
+      duration: 1500,
+      position: 'top'
+    });
+    await done.present();
   }
 
   async setRestricted(next: Set<string>) {
     await this.appState.setRestrictedApps(next);
+  }
+
+  toggleSelected() {
+    this.showSelectedList = !this.showSelectedList;
+    if (this.showSelectedList) {
+      this.showRestricted = false;
+    }
+  }
+
+  toggleRestricted() {
+    this.showRestricted = !this.showRestricted;
+    if (this.showRestricted) {
+      this.showSelectedList = false;
+    }
   }
 
   async onLimitChange(ev: any) {

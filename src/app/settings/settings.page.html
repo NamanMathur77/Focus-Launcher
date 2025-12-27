@@ -5,19 +5,10 @@
 <!-- SCROLLABLE CONTENT -->
 <ion-content class="setting-list-container">
 
-  <!-- Collapsible selector -->
-  <!-- <ion-item class="select-apps-collapse-btn" button lines="none" detail="false" (click)="showApps = !showApps">
-    <ion-label>
-      <h2>Select Apps</h2>
-      <p *ngIf="(countAndLimit$ | async) as cl">{{cl.cnt}} / {{cl.lim}} selected</p>
-    </ion-label>
-    <ion-button fill="clear" slot="end">{{ showApps ? 'Hide' : 'Show' }}</ion-button>
-  </ion-item> -->
-
   <div class="selector-list">
 
     <!-- Selected apps collapsible -->
-    <ion-item class="select-apps-collapse-btn" button lines="none" detail="false" (click)="showSelectedList = !showSelectedList">
+    <ion-item class="select-apps-collapse-btn" button lines="none" detail="false" (click)="toggleSelected()">
       <ion-label>
         <h2>Selected Apps</h2>
         <p *ngIf="(selectedCount$ | async) as cnt">{{cnt}} / {{(selectionLimit$ | async)}} selected</p>
@@ -41,7 +32,7 @@
     </div>
 
     <!-- Restricted apps collapsible (underneath selected apps) -->
-    <ion-item class="select-apps-collapse-btn" button lines="none" detail="false" (click)="showRestricted = !showRestricted">
+    <ion-item class="select-apps-collapse-btn" button lines="none" detail="false" (click)="toggleRestricted()">
       <ion-label>
         <h2>Restricted Apps</h2>
         <p *ngIf="(restrictedCount$ | async) as rc">{{rc}} selected</p>
@@ -51,7 +42,7 @@
 
     <div *ngIf="showRestricted">
       <app-app-list
-        [apps]="(apps$ | async) || []"
+        [apps]="(installed$ | async) || []"
         [selectable]="true"
         [selected]="(restricted$ | async) || emptySet"
         (selectionChange)="setRestricted($event)"

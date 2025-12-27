@@ -17,13 +17,15 @@ export class AppState {
   selectedApps$ = this.selectedAppsSubject.asObservable();
   restrictedApps$ = this.restrictedAppsSubject.asObservable();
 
-  visibleApps$ = combineLatest([
-    this.installedApps$,
-    this.selectedApps$]).pipe(
-      map(([installedApps, selectedApps]) =>
-        installedApps.filter(app => selectedApps.has(app.packageName))
-      )
-    );
+  /** Apps available for selection/viewing (installed minus restricted) */
+  availableApps$ = combineLatest([this.installedApps$, this.restrictedApps$]).pipe(
+    map(([installed, restricted]) => installed.filter(a => !restricted.has(a.packageName)))
+  );
+
+  /** Apps visible on the home screen: available apps that are selected by the user */
+  visibleApps$ = combineLatest([this.availableApps$, this.selectedApps$]).pipe(
+    map(([available, selected]) => available.filter(app => selected.has(app.packageName)))
+  );
 
   selectionLimit$ = this.selectionLimitSubject.asObservable();
 
@@ -43,14 +45,25 @@ export class AppState {
   async loadSelectedApps(){
     const saved = await Preferences.get({ key: 'selectedApps' });
     if(saved.value) {
-      this.selectedAppsSubject.next(new Set(JSON.parse(saved.value)));
+      const arr = JSON.parse(saved.value) as string[];
+      this.selectedAppsSubject.next(new Set<string>(arr || []));
     }
   }
 
   async loadRestrictedApps(){
     const saved = await Preferences.get({ key: 'restrictedApps' });
     if (saved.value) {
-      this.restrictedAppsSubject.next(new Set(JSON.parse(saved.value)));
+      const arr = JSON.parse(saved.value) as string[];
+      const restricted = new Set<string>(arr || []);
+      this.restrictedAppsSubject.next(restricted);
+
+      // Ensure selected apps do not contain restricted packages
+      const currentSelection = this.selectedAppsSubject.getValue();
+      const filtered = new Set([...currentSelection].filter(pkg => !restricted.has(pkg)));
+      if (filtered.size !== currentSelection.size) {
+        this.selectedAppsSubject.next(filtered);
+        await Preferences.set({ key: 'selectedApps', value: JSON.stringify([...filtered]) });
+      }
     }
   }
 
@@ -93,6 +106,13 @@ export class AppState {
     const current = this.restrictedAppsSubject.getValue();
     if (restricted) {
       current.add(pkg);
+      // If we restrict the app, remove it from the selected set if present
+      const currentSelection = this.selectedAppsSubject.getValue();
+      if (currentSelection.has(pkg)) {
+        currentSelection.delete(pkg);
+        this.selectedAppsSubject.next(currentSelection);
+        await Preferences.set({ key: 'selectedApps', value: JSON.stringify([...currentSelection]) });
+      }
     } else {
       current.delete(pkg);
     }
@@ -129,9 +149,19 @@ export class AppState {
 
   /** Replace the restricted set and persist it. */
   async setRestrictedApps(next: Set<string>) {
-    this.restrictedAppsSubject.next(new Set(next));
-    await Preferences.set({ key: 'restrictedApps', value: JSON.stringify([...next]) });
-    return { final: new Set(next) };
+    const newRestricted = new Set(next);
+    this.restrictedAppsSubject.next(newRestricted);
+    await Preferences.set({ key: 'restrictedApps', value: JSON.stringify([...newRestricted]) });
+
+    // Trim any selected apps that are now restricted
+    const currentSelection = this.selectedAppsSubject.getValue();
+    const filtered = new Set([...currentSelection].filter(pkg => !newRestricted.has(pkg)));
+    if (filtered.size !== currentSelection.size) {
+      this.selectedAppsSubject.next(filtered);
+      await Preferences.set({ key: 'selectedApps', value: JSON.stringify([...filtered]) });
+    }
+
+    return { final: new Set(newRestricted) };
   }
 
   /**
