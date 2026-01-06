@@ -13,6 +13,7 @@ export class AppState {
   private selectedAppsSubject  = new BehaviorSubject<Set<string>>(new Set());
   private restrictedAppsSubject = new BehaviorSubject<Set<string>>(new Set());
   private selectionLimitSubject = new BehaviorSubject<number>(7);
+  private backgroundColorSubject = new BehaviorSubject<string>('#000000');
   
   private temporaryUnrestrictions = new Map<string, number>(); // packageName -> expiryTime
   private checkInterval: any;
@@ -20,6 +21,7 @@ export class AppState {
   installedApps$ = this.installedAppsSubject.asObservable();
   selectedApps$ = this.selectedAppsSubject.asObservable();
   restrictedApps$ = this.restrictedAppsSubject.asObservable();
+  backgroundColor$ = this.backgroundColorSubject.asObservable();
 
   /** Apps available for selection/viewing (installed minus restricted) */
   availableApps$ = combineLatest([this.installedApps$, this.restrictedApps$]).pipe(
@@ -36,6 +38,7 @@ export class AppState {
   constructor(private router: Router) {
     this.startExpiryCheck();
     this.loadTemporaryUnrestrictions();
+    this.loadBackgroundColor();
   }
 
   /** Return the current selection limit synchronously. */
@@ -262,6 +265,22 @@ export class AppState {
         this.router.navigate(['/home']);
       }
     }
+  }
+
+  async loadBackgroundColor() {
+    const saved = await Preferences.get({ key: 'backgroundColor' });
+    if (saved.value) {
+      this.backgroundColorSubject.next(saved.value);
+    }
+  }
+
+  async setBackgroundColor(color: string) {
+    this.backgroundColorSubject.next(color);
+    await Preferences.set({ key: 'backgroundColor', value: color });
+  }
+
+  getBackgroundColor(): string {
+    return this.backgroundColorSubject.getValue();
   }
 
   ngOnDestroy() {

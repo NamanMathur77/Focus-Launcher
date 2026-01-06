@@ -18,9 +18,26 @@ import { AppState } from '../services/app-state';
 export class HomePage implements OnInit {
 
   apps$ = this.appState.visibleApps$;
+  backgroundColor$ = this.appState.backgroundColor$;
   failedToLoadApps = false;
 
   constructor(private appState: AppState, private toastCtrl: ToastController) {
+  }
+
+  getTextColor(backgroundColor: string | null): string {
+    if (!backgroundColor) return '#ffffff';
+    
+    // Convert hex to RGB
+    const hex = backgroundColor.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    // Calculate relative luminance
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+    // Return black for light backgrounds, white for dark backgrounds
+    return luminance > 0.5 ? '#000000' : '#ffffff';
   }
 
   async ngOnInit() {

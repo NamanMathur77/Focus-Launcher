@@ -26,4 +26,8 @@ export class SettingsPage implements OnInit {
   navigateToAppSettings() {
     this.router.navigate(['/settings/app-settings']);
   }
+
+  navigateToBackgroundSettings() {
+    this.router.navigate(['/settings/background-color']);
+  }
 }

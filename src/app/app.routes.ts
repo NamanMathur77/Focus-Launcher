@@ -24,6 +24,10 @@ export const routes: Routes = [
     loadComponent: () => import('./settings/app-details/app-details.page').then( m => m.AppDetailsPage)
   },
   {
+    path: 'settings/background-color',
+    loadComponent: () => import('./settings/background-color/background-color.page').then( m => m.BackgroundColorPage)
+  },
+  {
     path: 'onboarding',
     loadComponent: () => import('./pages/onboarding/onboarding.page').then( m => m.OnboardingPage),
     canActivate: [OnboardingGuard]

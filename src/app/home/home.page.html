@@ -1,16 +1,22 @@
-<div class="title-header">
+<div class="title-header" 
+  [style.background]="(backgroundColor$ | async) || '#000000'"
+  [style.color]="getTextColor((backgroundColor$ | async))">
   <span> </span>
   <span
     class="material-icons settings-icon"
+    [style.color]="getTextColor((backgroundColor$ | async))"
     [routerLink]="'/settings'">
     settings
   </span>
 </div>
 
-<ion-content class="home-apps-container">
+<ion-content 
+  class="home-apps-container" 
+  [style.--background]="(backgroundColor$ | async) || '#000000'"
+  [style.--color]="getTextColor((backgroundColor$ | async))">
 
   <!-- Empty state -->
-  <div *ngIf="!(apps$ | async)?.length" class="no-apps-container">
+  <div *ngIf="!(apps$ | async)?.length" class="no-apps-container" [style.color]="getTextColor((backgroundColor$ | async))">
     <ion-label>Please select the apps from settings</ion-label>
   </div>
 
@@ -20,8 +26,9 @@
       button
       *ngFor="let app of apps"
       (click)="openApp(app)"
+      [style.--color]="getTextColor((backgroundColor$ | async))"
     >
-      <ion-label>
+      <ion-label [style.color]="getTextColor((backgroundColor$ | async))">
         <h2>{{ app.appName }}</h2>
       </ion-label>
     </ion-item>
