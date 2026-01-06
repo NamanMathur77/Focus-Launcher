@@ -1,0 +1,42 @@
+ion-content {
+  --background: var(--ion-background-color);
+}
+
+.app-info {
+  padding: 24px 16px;
+  background: var(--ion-color-light);
+  text-align: center;
+  
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+  }
+  
+  .package-name {
+    font-size: 0.875rem;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
+
+ion-list {
+  margin-top: 16px;
+}
+
+ion-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  
+  ion-label {
+    h2 {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    p {
+      font-size: 0.875rem;
+      color: var(--ion-color-medium);
+    }
+  }
+}

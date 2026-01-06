@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>App Settings</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item 
+      *ngFor="let app of (installedApps$ | async)" 
+      button 
+      detail="true"
+      (click)="onAppClick(app)">
+      <ion-label>
+        <h2>{{ app.appName }}</h2>
+        <p>{{ app.packageName }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

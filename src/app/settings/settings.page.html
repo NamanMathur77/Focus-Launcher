@@ -5,50 +5,13 @@
 <!-- SCROLLABLE CONTENT -->
 <ion-content class="setting-list-container">
 
-  <div class="selector-list">
-
-    <!-- Selected apps collapsible -->
-    <ion-item class="select-apps-collapse-btn" button lines="none" detail="false" (click)="toggleSelected()">
+  <ion-list>
+    <ion-item button detail="true" (click)="navigateToAppSettings()">
       <ion-label>
-        <h2>Selected Apps</h2>
-        <p *ngIf="(selectedCount$ | async) as cnt">{{cnt}} / {{(selectionLimit$ | async)}} selected</p>
+        <h2>App Settings</h2>
+        <p>Manage your apps, selections, and restrictions</p>
       </ion-label>
-      <ion-button fill="clear" slot="end">{{ showSelectedList ? 'Hide' : 'Show' }}</ion-button>
     </ion-item>
-  </div>
-
-    <div *ngIf="showSelectedList">
-      <ion-item class="select-max-apps-allowed-container" lines="none">
-        <ion-label>Max selections</ion-label>
-        <ion-input slot="end" class="limit-input" type="number" min="1" [value]="(selectionLimit$ | async)" inputmode="numeric" (ionChange)="onLimitChange($event)" placeholder="N"></ion-input>
-      </ion-item>
-      <app-app-list
-        [apps]="(apps$ | async) || []"
-        [selectable]="true"
-        [selected]="(selected$ | async) || emptySet"
-        (selectionChange)="setSelection($event)"
-        (toggleRequest)="onToggleRequest($event)"
-      ></app-app-list>
-    </div>
-
-    <!-- Restricted apps collapsible (underneath selected apps) -->
-    <ion-item class="select-apps-collapse-btn" button lines="none" detail="false" (click)="toggleRestricted()">
-      <ion-label>
-        <h2>Restricted Apps</h2>
-        <p *ngIf="(restrictedCount$ | async) as rc">{{rc}} selected</p>
-      </ion-label>
-      <ion-button fill="clear" slot="end">{{ showRestricted ? 'Hide' : 'Show' }}</ion-button>
-    </ion-item>
-
-    <div *ngIf="showRestricted">
-      <app-app-list
-        [apps]="(installed$ | async) || []"
-        [selectable]="true"
-        [selected]="(restricted$ | async) || emptySet"
-        (selectionChange)="setRestricted($event)"
-        (toggleRequest)="onRestrictedToggle($event)"
-      ></app-app-list>
-    </div>
-  <!-- </div> -->
+  </ion-list>
 
 </ion-content>

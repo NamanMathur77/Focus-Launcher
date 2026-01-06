@@ -16,6 +16,14 @@ export const routes: Routes = [
     loadComponent: () => import('./settings/settings.page').then( m => m.SettingsPage)
   },
   {
+    path: 'settings/app-settings',
+    loadComponent: () => import('./settings/app-settings/app-settings.page').then( m => m.AppSettingsPage)
+  },
+  {
+    path: 'settings/app-details/:packageName',
+    loadComponent: () => import('./settings/app-details/app-details.page').then( m => m.AppDetailsPage)
+  },
+  {
     path: 'onboarding',
     loadComponent: () => import('./pages/onboarding/onboarding.page').then( m => m.OnboardingPage),
     canActivate: [OnboardingGuard]
