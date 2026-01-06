@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonButtons, IonButton } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonButtons, IonButton, ToastController } from '@ionic/angular/standalone';
 import { Capacitor } from '@capacitor/core';
 import { AppLauncher, InstalledApp } from '../native/app-launcher';
 import { Preferences } from '@capacitor/preferences';
@@ -20,7 +20,7 @@ export class HomePage implements OnInit {
   apps$ = this.appState.visibleApps$;
   failedToLoadApps = false;
 
-  constructor(private appState: AppState) {
+  constructor(private appState: AppState, private toastCtrl: ToastController) {
   }
 
   async ngOnInit() {
@@ -28,6 +28,7 @@ export class HomePage implements OnInit {
 
     await this.appState.loadInstalledApps();
     await this.appState.loadSelectedApps();
+    await this.appState.loadRestrictedApps();
 
     console.log('HomePage loaded');
   }
@@ -37,6 +38,19 @@ export class HomePage implements OnInit {
     (async () => {
       if (Capacitor.getPlatform() === 'web') {
         console.warn('openApp skipped on web:', app.packageName);
+        return;
+      }
+
+      // Check if app is restricted
+      const restrictedApps = this.appState.getRestrictedApps();
+      if (restrictedApps.has(app.packageName)) {
+        const toast = await this.toastCtrl.create({
+          message: `${app.appName} is restricted`,
+          duration: 2000,
+          color: 'danger',
+          position: 'top'
+        });
+        await toast.present();
         return;
       }
 

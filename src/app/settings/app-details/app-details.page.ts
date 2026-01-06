@@ -14,7 +14,8 @@ import {
   IonBackButton,
   IonButton,
   ToastController,
-  AlertController 
+  AlertController,
+  ActionSheetController 
 } from '@ionic/angular/standalone';
 import { AppState } from '../../services/app-state';
 import { InstalledApp } from '../../native/app-launcher';
@@ -66,7 +67,8 @@ export class AppDetailsPage implements OnInit {
     private router: Router,
     private appState: AppState,
     private toastCtrl: ToastController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private actionSheetCtrl: ActionSheetController
   ) {}
 
   async ngOnInit() {
@@ -103,16 +105,104 @@ export class AppDetailsPage implements OnInit {
     if (checked) {
       // Restricting the app
       await this.appState.toggleRestrictedApp(this.packageName, true);
+      // Clear any temporary unrestriction
+      await this.appState.clearTemporaryUnrestriction(this.packageName);
       return;
     }
 
-    // Unrestricting the app - show confirmation with 10s countdown
+    // Unrestricting the app - show time options
     event.target.checked = true;
     event.target.disabled = true;
 
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Unrestrict App For',
+      buttons: [
+        {
+          text: '2 Minutes',
+          handler: () => {
+            this.unrestrictAppWithTimer(2, event.target);
+          }
+        },
+        {
+          text: '10 Minutes',
+          handler: () => {
+            this.unrestrictAppWithTimer(10, event.target);
+          }
+        },
+        {
+          text: '20 Minutes',
+          handler: () => {
+            this.unrestrictAppWithTimer(15, event.target);
+          }
+        },
+        {
+          text: '40 Minutes',
+          handler: () => {
+            this.unrestrictAppWithTimer(40, event.target);
+          }
+        },
+        {
+          text: 'Permanently Unrestrict',
+          role: 'destructive',
+          handler: () => {
+            this.showPermanentUnrestrictConfirmation(event.target);
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            event.target.disabled = false;
+          }
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+  private async unrestrictAppWithTimer(minutes: number, toggleElement: any) {
+    // Unrestrict the app
+    await this.appState.toggleRestrictedApp(this.packageName, false);
+    
+    // Set a timer to re-restrict
+    const expiryTime = Date.now() + (minutes * 60 * 1000);
+    await this.appState.setTemporaryUnrestriction(this.packageName, expiryTime);
+    
+    toggleElement.checked = false;
+    toggleElement.disabled = false;
+    
+    const toast = await this.toastCtrl.create({
+      message: `App unrestricted for ${minutes} minutes`,
+      duration: 2000,
+      position: 'top',
+      color: 'success'
+    });
+    await toast.present();
+
+    // Schedule re-restriction
+    setTimeout(async () => {
+      const currentExpiry = this.appState.getTemporaryUnrestrictionExpiry(this.packageName);
+      // Only re-restrict if the expiry time matches (not cancelled or changed)
+      if (currentExpiry === expiryTime) {
+        await this.appState.toggleRestrictedApp(this.packageName, true);
+        await this.appState.clearTemporaryUnrestriction(this.packageName);
+        
+        const restrictedToast = await this.toastCtrl.create({
+          message: `${this.app?.appName} has been restricted again`,
+          duration: 2000,
+          position: 'top',
+          color: 'warning'
+        });
+        await restrictedToast.present();
+      }
+    }, minutes * 60 * 1000);
+  }
+
+  private async showPermanentUnrestrictConfirmation(toggleElement: any) {
     const alert = await this.alertCtrl.create({
       header: 'Wait — think about it',
-      message: 'Unrestricting this app in 10 seconds. Press Undo to cancel.',
+      message: 'Permanently unrestricting this app in 10 seconds. Press Undo to cancel.',
       buttons: [
         {
           text: 'Undo',
@@ -132,7 +222,7 @@ export class AppDetailsPage implements OnInit {
     const { role } = await alert.onDidDismiss();
     clearTimeout(timer);
 
-    event.target.disabled = false;
+    toggleElement.disabled = false;
 
     if (role === 'cancel') {
       const t = await this.toastCtrl.create({
@@ -144,12 +234,13 @@ export class AppDetailsPage implements OnInit {
       return;
     }
 
-    // Proceed to unrestrict
+    // Proceed to permanently unrestrict
     await this.appState.toggleRestrictedApp(this.packageName, false);
-    event.target.checked = false;
+    await this.appState.clearTemporaryUnrestriction(this.packageName);
+    toggleElement.checked = false;
     
     const done = await this.toastCtrl.create({
-      message: 'App unrestricted',
+      message: 'App permanently unrestricted',
       duration: 1500,
       position: 'top'
     });

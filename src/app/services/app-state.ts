@@ -3,6 +3,7 @@ import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { AppLauncher, InstalledApp } from '../native/app-launcher';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,9 @@ export class AppState {
   private selectedAppsSubject  = new BehaviorSubject<Set<string>>(new Set());
   private restrictedAppsSubject = new BehaviorSubject<Set<string>>(new Set());
   private selectionLimitSubject = new BehaviorSubject<number>(7);
+  
+  private temporaryUnrestrictions = new Map<string, number>(); // packageName -> expiryTime
+  private checkInterval: any;
 
   installedApps$ = this.installedAppsSubject.asObservable();
   selectedApps$ = this.selectedAppsSubject.asObservable();
@@ -29,9 +33,19 @@ export class AppState {
 
   selectionLimit$ = this.selectionLimitSubject.asObservable();
 
+  constructor(private router: Router) {
+    this.startExpiryCheck();
+    this.loadTemporaryUnrestrictions();
+  }
+
   /** Return the current selection limit synchronously. */
   getSelectionLimit(): number {
     return this.selectionLimitSubject.getValue();
+  }
+
+  /** Return the current restricted apps set synchronously. */
+  getRestrictedApps(): Set<string> {
+    return this.restrictedAppsSubject.getValue();
   }
 
   async loadInstalledApps(){
@@ -119,6 +133,7 @@ export class AppState {
     this.restrictedAppsSubject.next(current);
 
     await Preferences.set({ key: 'restrictedApps', value: JSON.stringify([...current]) });
+    
     return true;
   }
 
@@ -188,5 +203,70 @@ export class AppState {
     }
 
     return { trimmed: false, final: currentSelection };
+  }
+
+  private async loadTemporaryUnrestrictions() {
+    const saved = await Preferences.get({ key: 'temporaryUnrestrictions' });
+    if (saved.value) {
+      const entries = JSON.parse(saved.value) as [string, number][];
+      this.temporaryUnrestrictions = new Map(entries);
+      
+      // Check for any expired ones immediately
+      await this.checkExpiredUnrestrictions();
+    }
+  }
+
+  async setTemporaryUnrestriction(packageName: string, expiryTime: number) {
+    this.temporaryUnrestrictions.set(packageName, expiryTime);
+    await Preferences.set({
+      key: 'temporaryUnrestrictions',
+      value: JSON.stringify(Array.from(this.temporaryUnrestrictions.entries()))
+    });
+  }
+
+  async clearTemporaryUnrestriction(packageName: string) {
+    this.temporaryUnrestrictions.delete(packageName);
+    await Preferences.set({
+      key: 'temporaryUnrestrictions',
+      value: JSON.stringify(Array.from(this.temporaryUnrestrictions.entries()))
+    });
+  }
+
+  getTemporaryUnrestrictionExpiry(packageName: string): number | undefined {
+    return this.temporaryUnrestrictions.get(packageName);
+  }
+
+  private startExpiryCheck() {
+    // Check every 5 seconds (reduced from 30 for faster response)
+    this.checkInterval = setInterval(() => {
+      this.checkExpiredUnrestrictions();
+    }, 5000);
+  }
+
+  private async checkExpiredUnrestrictions() {
+    const now = Date.now();
+    const expired: string[] = [];
+
+    for (const [packageName, expiryTime] of this.temporaryUnrestrictions.entries()) {
+      if (now >= expiryTime) {
+        expired.push(packageName);
+      }
+    }
+
+    for (const packageName of expired) {
+      await this.toggleRestrictedApp(packageName, true);
+      await this.clearTemporaryUnrestriction(packageName);
+      
+      // If user is currently on this app's page, navigate back to home
+      if (this.router.url.includes(packageName)) {
+        this.router.navigate(['/home']);
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.checkInterval) {
+      clearInterval(this.checkInterval);
+    }
   }
 }
