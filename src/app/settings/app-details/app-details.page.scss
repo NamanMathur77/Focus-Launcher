@@ -40,3 +40,13 @@ ion-item {
     }
   }
 }
+
+.uninstall-section {
+  padding: 24px 16px;
+  margin-top: 16px;
+  
+  ion-button {
+    --border-width: 2px;
+    font-weight: 600;
+  }
+}

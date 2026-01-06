@@ -12,6 +12,7 @@ import {
   IonToggle,
   IonButtons, 
   IonBackButton,
+  IonButton,
   ToastController,
   AlertController 
 } from '@ionic/angular/standalone';
@@ -19,6 +20,7 @@ import { AppState } from '../../services/app-state';
 import { InstalledApp } from '../../native/app-launcher';
 import { map } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-app-details',
@@ -35,6 +37,7 @@ import { combineLatest } from 'rxjs';
     IonList,
     IonLabel,
     IonToggle,
+    IonButton,
     IonButtons,
     IonBackButton
   ]
@@ -151,5 +154,53 @@ export class AppDetailsPage implements OnInit {
       position: 'top'
     });
     await done.present();
+  }
+
+  async uninstallApp() {
+    if (Capacitor.getPlatform() === 'web') {
+      const t = await this.toastCtrl.create({
+        message: 'Uninstall is only available on Android',
+        duration: 2000,
+        position: 'top'
+      });
+      await t.present();
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'Uninstall App',
+      message: `Are you sure you want to uninstall ${this.app?.appName}? This will open the system settings.`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Uninstall',
+          role: 'destructive',
+          handler: () => {
+            this.openAppSettings();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private async openAppSettings() {
+    try {
+      const { AppLauncher } = await import('../../native/app-launcher');
+      await AppLauncher.openAppSettings({ packageName: this.packageName });
+    } catch (error) {
+      console.error('Error opening app settings:', error);
+      const t = await this.toastCtrl.create({
+        message: 'Unable to open app settings. Please uninstall manually from Android settings.',
+        duration: 3000,
+        color: 'warning',
+        position: 'top'
+      });
+      await t.present();
+    }
   }
 }

@@ -3,6 +3,7 @@ package com.focuslauncher.app;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
@@ -84,4 +85,25 @@ public class AppLauncherPlugin extends Plugin {
                 call.reject("Failed to open launcher chooser", e);
             }
         }
+
+    @PluginMethod
+    public void openAppSettings(PluginCall call) {
+        String packageName = call.getString("packageName");
+
+        if (packageName == null) {
+            call.reject("Package name missing");
+            return;
+        }
+
+        try {
+            Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(android.net.Uri.parse("package:" + packageName));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            getContext().startActivity(intent);
+            call.resolve();
+        } catch (Exception e) {
+            call.reject("Failed to open app settings", e);
+        }
+    }
 }

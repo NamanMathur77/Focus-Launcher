@@ -8,7 +8,7 @@ export interface InstalledApp {
 export interface AppLauncherPlugin {
   getInstalledApps(): Promise<{ apps: InstalledApp[] }>;
   openApp(options: { packageName: string }): Promise<void>;
-
+  openAppSettings(options: { packageName: string }): Promise<void>;
   openLauncherChooser(): Promise<void>;
 }
 
