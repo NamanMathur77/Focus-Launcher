@@ -32,6 +32,10 @@ export const routes: Routes = [
     loadComponent: () => import('./settings/app-limit/app-limit.page').then( m => m.AppLimitPage)
   },
   {
+    path: 'notes',
+    loadComponent: () => import('./notes/notes.page').then( m => m.NotesPage)
+  },
+  {
     path: 'onboarding',
     loadComponent: () => import('./pages/onboarding/onboarding.page').then( m => m.OnboardingPage),
     canActivate: [OnboardingGuard]

@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Notes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="notes.length === 0" class="empty-state">
+    <ion-label>No notes yet. Tap + to add your first note.</ion-label>
+  </div>
+
+  <ion-list *ngIf="notes.length > 0">
+    <ion-card *ngFor="let note of notes" class="note-card">
+      <ion-card-header>
+        <ion-card-title>{{ note.title }}</ion-card-title>
+        <div class="note-date">{{ formatDate(note.updatedAt) }}</div>
+      </ion-card-header>
+      <ion-card-content>
+        <p>{{ note.content }}</p>
+        <div class="note-actions">
+          <ion-button fill="clear" size="small" (click)="editNote(note)">
+            <ion-icon slot="icon-only" name="create"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" size="small" color="danger" (click)="deleteNote(note)">
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="addNote()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

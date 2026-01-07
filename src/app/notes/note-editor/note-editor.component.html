@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ isEdit ? 'Edit Note' : 'New Note' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" [disabled]="!title.trim() || !content.trim()">
+        <ion-icon name="checkmark"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="note-editor-container">
+    <ion-input
+      [(ngModel)]="title"
+      placeholder="Note title"
+      class="note-title-input"
+      [clearInput]="true"
+    ></ion-input>
+
+    <ion-textarea
+      [(ngModel)]="content"
+      placeholder="Write your note here..."
+      class="note-content-textarea"
+      [autoGrow]="true"
+      rows="10"
+    ></ion-textarea>
+  </div>
+</ion-content>

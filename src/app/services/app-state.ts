@@ -283,6 +283,36 @@ export class AppState {
     return this.backgroundColorSubject.getValue();
   }
 
+  // Notes management
+  async getNotes(): Promise<any[]> {
+    const saved = await Preferences.get({ key: 'notes' });
+    if (saved.value) {
+      return JSON.parse(saved.value);
+    }
+    return [];
+  }
+
+  async addNote(note: any) {
+    const notes = await this.getNotes();
+    notes.unshift(note); // Add to beginning
+    await Preferences.set({ key: 'notes', value: JSON.stringify(notes) });
+  }
+
+  async updateNote(updatedNote: any) {
+    const notes = await this.getNotes();
+    const index = notes.findIndex(n => n.id === updatedNote.id);
+    if (index !== -1) {
+      notes[index] = updatedNote;
+      await Preferences.set({ key: 'notes', value: JSON.stringify(notes) });
+    }
+  }
+
+  async deleteNote(noteId: string) {
+    const notes = await this.getNotes();
+    const filteredNotes = notes.filter(n => n.id !== noteId);
+    await Preferences.set({ key: 'notes', value: JSON.stringify(filteredNotes) });
+  }
+
   ngOnDestroy() {
     if (this.checkInterval) {
       clearInterval(this.checkInterval);
