@@ -28,6 +28,10 @@ export const routes: Routes = [
     loadComponent: () => import('./settings/background-color/background-color.page').then( m => m.BackgroundColorPage)
   },
   {
+    path: 'settings/app-limit',
+    loadComponent: () => import('./settings/app-limit/app-limit.page').then( m => m.AppLimitPage)
+  },
+  {
     path: 'onboarding',
     loadComponent: () => import('./pages/onboarding/onboarding.page').then( m => m.OnboardingPage),
     canActivate: [OnboardingGuard]

@@ -188,8 +188,8 @@ export class AppState {
    * describing whether trimming occurred and the new selected set.
    */
   async setSelectionLimit(limit: number) {
-    // enforce min 1 and max 10 for safety
-    const nextLimit = Math.max(1, Math.min(10, Math.floor(Number(limit) || 1)));
+    // enforce min 1 and max 50 for safety
+    const nextLimit = Math.max(1, Math.min(50, Math.floor(Number(limit) || 1)));
     this.selectionLimitSubject.next(nextLimit);
     await Preferences.set({ key: 'selectionLimit', value: String(nextLimit) });
 

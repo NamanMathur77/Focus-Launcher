@@ -1,0 +1,28 @@
+<!-- TOP SAFE AREA -->
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>App Display Limit</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<!-- SCROLLABLE CONTENT -->
+<ion-content>
+  <ion-list>
+    <ion-list-header>
+      <ion-label>
+        <h2>Maximum Apps on Home Screen</h2>
+        <p>Choose how many apps can be displayed</p>
+      </ion-label>
+    </ion-list-header>
+
+    <ion-radio-group [value]="selectedLimit" (ionChange)="onLimitChange($event)">
+      <ion-item *ngFor="let option of limitOptions">
+        <ion-label>{{ option }} apps</ion-label>
+        <ion-radio slot="start" [value]="option"></ion-radio>
+      </ion-item>
+    </ion-radio-group>
+  </ion-list>
+</ion-content>

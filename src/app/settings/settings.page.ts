@@ -30,4 +30,8 @@ export class SettingsPage implements OnInit {
   navigateToBackgroundSettings() {
     this.router.navigate(['/settings/background-color']);
   }
+
+  navigateToAppLimit() {
+    this.router.navigate(['/settings/app-limit']);
+  }
 }
