@@ -1,26 +1,36 @@
 <!-- TOP SAFE AREA -->
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar 
+    [style.--background]="(backgroundColor$ | async) || '#000000'"
+    [style.--color]="getTextColor((backgroundColor$ | async))">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings"></ion-back-button>
+      <ion-back-button 
+        defaultHref="/settings"
+        [style.color]="getTextColor((backgroundColor$ | async))">
+      </ion-back-button>
     </ion-buttons>
-    <ion-title>App Display Limit</ion-title>
+    <ion-title [style.color]="getTextColor((backgroundColor$ | async))">App Display Limit</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <!-- SCROLLABLE CONTENT -->
-<ion-content>
-  <ion-list>
-    <ion-list-header>
-      <ion-label>
+<ion-content 
+  [style.--background]="(backgroundColor$ | async) || '#000000'"
+  [style.color]="getTextColor((backgroundColor$ | async))">
+  <ion-list [style.background]="(backgroundColor$ | async) || '#000000'">
+    <ion-list-header [style.--background]="(backgroundColor$ | async) || '#000000'">
+      <ion-label [style.color]="getTextColor((backgroundColor$ | async))">
         <h2>Maximum Apps on Home Screen</h2>
         <p>Choose how many apps can be displayed</p>
       </ion-label>
     </ion-list-header>
 
     <ion-radio-group [value]="selectedLimit" (ionChange)="onLimitChange($event)">
-      <ion-item *ngFor="let option of limitOptions">
-        <ion-label>{{ option }} apps</ion-label>
+      <ion-item 
+        *ngFor="let option of limitOptions"
+        [style.--background]="(backgroundColor$ | async) || '#000000'"
+        [style.--color]="getTextColor((backgroundColor$ | async))">
+        <ion-label [style.color]="getTextColor((backgroundColor$ | async))">{{ option }} apps</ion-label>
         <ion-radio slot="start" [value]="option"></ion-radio>
       </ion-item>
     </ion-radio-group>

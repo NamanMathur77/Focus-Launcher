@@ -1,22 +1,26 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Notes</ion-title>
+  <ion-toolbar 
+    [style.--background]="(backgroundColor$ | async) || '#000000'"
+    [style.--color]="getTextColor((backgroundColor$ | async))">
+    <ion-title [style.color]="getTextColor((backgroundColor$ | async))">Notes</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div *ngIf="notes.length === 0" class="empty-state">
+<ion-content 
+  [style.--background]="(backgroundColor$ | async) || '#000000'"
+  [style.color]="getTextColor((backgroundColor$ | async))">
+  <div *ngIf="notes.length === 0" class="empty-state" [style.color]="getTextColor((backgroundColor$ | async))">
     <ion-label>No notes yet. Tap + to add your first note.</ion-label>
   </div>
 
   <ion-list *ngIf="notes.length > 0">
     <ion-card *ngFor="let note of notes" class="note-card">
       <ion-card-header>
-        <ion-card-title>{{ note.title }}</ion-card-title>
-        <div class="note-date">{{ formatDate(note.updatedAt) }}</div>
+        <ion-card-title [style.color]="getTextColor((backgroundColor$ | async))">{{ note.title }}</ion-card-title>
+        <div class="note-date" [style.color]="getTextColor((backgroundColor$ | async))">{{ formatDate(note.updatedAt) }}</div>
       </ion-card-header>
       <ion-card-content>
-        <p>{{ note.content }}</p>
+        <p [style.color]="getTextColor((backgroundColor$ | async))">{{ note.content }}</p>
         <div class="note-actions">
           <ion-button fill="clear" size="small" (click)="editNote(note)">
             <ion-icon slot="icon-only" name="create"></ion-icon>

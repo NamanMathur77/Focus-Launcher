@@ -1,26 +1,34 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar 
+    [style.--background]="(backgroundColor$ | async) || '#000000'"
+    [style.--color]="getTextColor((backgroundColor$ | async))">
     <ion-buttons slot="start">
-      <ion-button (click)="dismiss()">
+      <ion-button (click)="dismiss()" [style.color]="getTextColor((backgroundColor$ | async))">
         <ion-icon name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>{{ isEdit ? 'Edit Note' : 'New Note' }}</ion-title>
+    <ion-title [style.color]="getTextColor((backgroundColor$ | async))">{{ isEdit ? 'Edit Note' : 'New Note' }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="save()" [disabled]="!title.trim() || !content.trim()">
+      <ion-button 
+        (click)="save()" 
+        [disabled]="!title.trim() || !content.trim()"
+        [style.color]="getTextColor((backgroundColor$ | async))">
         <ion-icon name="checkmark"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content 
+  [style.--background]="(backgroundColor$ | async) || '#000000'"
+  [style.color]="getTextColor((backgroundColor$ | async))">
   <div class="note-editor-container">
     <ion-input
       [(ngModel)]="title"
       placeholder="Note title"
       class="note-title-input"
       [clearInput]="true"
+      [style.color]="getTextColor((backgroundColor$ | async))"
     ></ion-input>
 
     <ion-textarea
@@ -29,6 +37,7 @@
       class="note-content-textarea"
       [autoGrow]="true"
       rows="10"
+      [style.color]="getTextColor((backgroundColor$ | async))"
     ></ion-textarea>
   </div>
 </ion-content>

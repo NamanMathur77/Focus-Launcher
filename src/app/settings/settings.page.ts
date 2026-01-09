@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent, IonList, IonItem, IonLabel } from '@ionic/angular/standalone';
+import { AppState } from '../services/app-state';
 
 @Component({
   selector: 'app-settings',
@@ -16,11 +17,16 @@ import { IonContent, IonList, IonItem, IonLabel } from '@ionic/angular/standalon
 ]
 })
 export class SettingsPage implements OnInit {
+  backgroundColor$ = this.appState.backgroundColor$;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private appState: AppState) { }
 
   async ngOnInit() {
     console.log('SettingsPage loaded');
+  }
+
+  getTextColor(backgroundColor: string | null): string {
+    return this.appState.getTextColor(backgroundColor || undefined);
   }
 
   navigateToAppSettings() {

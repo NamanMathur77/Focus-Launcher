@@ -39,6 +39,7 @@ import { AppState } from '../../services/app-state';
 export class BackgroundColorPage implements OnInit {
   
   selectedColor: string = '#000000';
+  backgroundColor$ = this.appState.backgroundColor$;
 
   colors = [
     { name: 'Black', value: '#000000' },
@@ -70,5 +71,9 @@ export class BackgroundColorPage implements OnInit {
     const color = event.detail.value;
     this.selectedColor = color;
     await this.appState.setBackgroundColor(color);
+  }
+
+  getTextColor(backgroundColor: string | null): string {
+    return this.appState.getTextColor(backgroundColor || undefined);
   }
 }

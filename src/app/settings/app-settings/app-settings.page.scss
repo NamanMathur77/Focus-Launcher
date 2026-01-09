@@ -1,14 +1,18 @@
 ion-content {
-  --background: var(--ion-background-color);
+  --background: var(--background, #000000);
+  --padding-bottom: 80px;
 }
 
 ion-list {
-  padding: 0;
+  padding: 0 0 80px 0;
+  background: transparent;
 }
 
 ion-item {
   --padding-start: 16px;
   --padding-end: 16px;
+  --background: transparent;
+  --border-color: rgba(255, 255, 255, 0.1);
   
   h2 {
     font-weight: 500;

@@ -1,10 +1,11 @@
 ion-content {
-  --background: var(--ion-background-color);
+  --background: var(--background, #000000);
+  --padding-bottom: 80px;
 }
 
 .app-info {
   padding: 24px 16px;
-  background: var(--ion-color-light);
+  background: transparent;
   text-align: center;
   
   h2 {
@@ -22,11 +23,14 @@ ion-content {
 
 ion-list {
   margin-top: 16px;
+  background: transparent;
 }
 
 ion-item {
   --padding-start: 16px;
   --padding-end: 16px;
+  --background: transparent;
+  --border-color: rgba(255, 255, 255, 0.1);
   
   ion-label {
     h2 {

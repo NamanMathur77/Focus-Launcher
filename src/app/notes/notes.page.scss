@@ -1,5 +1,6 @@
 ion-content {
-  --background: var(--ion-background-color);
+  --background: var(--background, #000000);
+  --padding-bottom: 80px;
 }
 
 .empty-state {
@@ -51,4 +52,9 @@ ion-content {
 
 ion-fab-button {
   --background: var(--ion-color-primary);
+}
+
+ion-fab {
+  margin-bottom: 80px;
+  margin-right: 16px;
 }

@@ -1,10 +1,17 @@
 ion-content {
-  --background: var(--ion-background-color);
+  --background: var(--background, #000000);
+  --padding-bottom: 80px;
+}
+
+ion-list {
+  background: transparent;
+  padding-bottom: 80px;
 }
 
 ion-item {
   --padding-start: 16px;
   --padding-end: 16px;
+  --background: transparent;
 }
 
 .color-preview {

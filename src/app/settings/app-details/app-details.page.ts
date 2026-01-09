@@ -47,6 +47,7 @@ export class AppDetailsPage implements OnInit {
 
   packageName: string = '';
   app: InstalledApp | null = null;
+  backgroundColor$ = this.appState.backgroundColor$;
   
   isSelected$ = combineLatest([
     this.appState.selectedApps$,
@@ -78,6 +79,10 @@ export class AppDetailsPage implements OnInit {
     this.appState.installedApps$.subscribe(apps => {
       this.app = apps.find(a => a.packageName === this.packageName) || null;
     });
+  }
+
+  getTextColor(backgroundColor: string | null): string {
+    return this.appState.getTextColor(backgroundColor || undefined);
   }
 
   async onShowOnMainScreenToggle(event: any) {

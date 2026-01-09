@@ -16,6 +16,7 @@ import {
 import { addIcons } from 'ionicons';
 import { close, checkmark } from 'ionicons/icons';
 import { Note } from '../notes.page';
+import { AppState } from '../../services/app-state';
 
 @Component({
   selector: 'app-note-editor',
@@ -42,8 +43,9 @@ export class NoteEditorComponent implements OnInit {
 
   title: string = '';
   content: string = '';
+  backgroundColor$ = this.appState.backgroundColor$;
 
-  constructor(private modalCtrl: ModalController) {
+  constructor(private modalCtrl: ModalController, private appState: AppState) {
     addIcons({ close, checkmark });
   }
 
@@ -65,5 +67,9 @@ export class NoteEditorComponent implements OnInit {
         content: this.content
       });
     }
+  }
+
+  getTextColor(backgroundColor: string | null): string {
+    return this.appState.getTextColor(backgroundColor || undefined);
   }
 }

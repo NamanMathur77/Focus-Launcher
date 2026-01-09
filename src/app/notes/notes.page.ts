@@ -63,6 +63,7 @@ export interface Note {
 })
 export class NotesPage implements OnInit {
   notes: Note[] = [];
+  backgroundColor$ = this.appState.backgroundColor$;
 
   constructor(
     private appState: AppState,
@@ -179,5 +180,9 @@ export class NotesPage implements OnInit {
   formatDate(timestamp: number): string {
     const date = new Date(timestamp);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  }
+
+  getTextColor(backgroundColor: string | null): string {
+    return this.appState.getTextColor(backgroundColor || undefined);
   }
 }

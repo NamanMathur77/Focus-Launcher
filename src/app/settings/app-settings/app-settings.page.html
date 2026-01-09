@@ -1,20 +1,29 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar 
+    [style.--background]="(backgroundColor$ | async) || '#000000'"
+    [style.--color]="getTextColor((backgroundColor$ | async))">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings"></ion-back-button>
+      <ion-back-button 
+        defaultHref="/settings"
+        [style.color]="getTextColor((backgroundColor$ | async))">
+      </ion-back-button>
     </ion-buttons>
-    <ion-title>App Settings</ion-title>
+    <ion-title [style.color]="getTextColor((backgroundColor$ | async))">App Settings</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
+<ion-content 
+  [style.--background]="(backgroundColor$ | async) || '#000000'"
+  [style.color]="getTextColor((backgroundColor$ | async))">
+  <ion-list [style.background]="(backgroundColor$ | async) || '#000000'">
     <ion-item 
       *ngFor="let app of (installedApps$ | async)" 
       button 
       detail="true"
-      (click)="onAppClick(app)">
-      <ion-label>
+      (click)="onAppClick(app)"
+      [style.--background]="(backgroundColor$ | async) || '#000000'"
+      [style.--color]="getTextColor((backgroundColor$ | async))">
+      <ion-label [style.color]="getTextColor((backgroundColor$ | async))">
         <h2>{{ app.appName }}</h2>
       </ion-label>
     </ion-item>

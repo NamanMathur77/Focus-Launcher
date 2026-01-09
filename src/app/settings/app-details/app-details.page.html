@@ -1,20 +1,27 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar 
+    [style.--background]="(backgroundColor$ | async) || '#000000'"
+    [style.--color]="getTextColor((backgroundColor$ | async))">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings/app-settings"></ion-back-button>
+      <ion-back-button 
+        defaultHref="/settings/app-settings"
+        [style.color]="getTextColor((backgroundColor$ | async))">
+      </ion-back-button>
     </ion-buttons>
-    <ion-title>{{ app?.appName || 'App Details' }}</ion-title>
+    <ion-title [style.color]="getTextColor((backgroundColor$ | async))">{{ app?.appName || 'App Details' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content 
+  [style.--background]="(backgroundColor$ | async) || '#000000'"
+  [style.color]="getTextColor((backgroundColor$ | async))">
   <div class="app-info" *ngIf="app">
-    <h2>{{ app.appName }}</h2>
+    <h2 [style.color]="getTextColor((backgroundColor$ | async))">{{ app.appName }}</h2>
   </div>
 
-  <ion-list>
-    <ion-item>
-      <ion-label>
+  <ion-list [style.background]="(backgroundColor$ | async) || '#000000'">
+    <ion-item [style.--background]="(backgroundColor$ | async) || '#000000'">
+      <ion-label [style.color]="getTextColor((backgroundColor$ | async))">
         <h2>Show on Main Screen</h2>
         <p>Display this app on your home screen</p>
       </ion-label>
@@ -25,8 +32,8 @@
       </ion-toggle>
     </ion-item>
 
-    <ion-item>
-      <ion-label>
+    <ion-item [style.--background]="(backgroundColor$ | async) || '#000000'">
+      <ion-label [style.color]="getTextColor((backgroundColor$ | async))">
         <h2>Restrict App</h2>
         <p>Block access to this app</p>
       </ion-label>

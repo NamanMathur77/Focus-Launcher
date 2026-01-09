@@ -1,27 +1,47 @@
 <!-- TOP SAFE AREA -->
-<div class="title-header">
+<div class="title-header" 
+  [style.background]="(backgroundColor$ | async) || '#000000'"
+  [style.color]="getTextColor((backgroundColor$ | async))">
   <span>Settings</span>
 </div>
 <!-- SCROLLABLE CONTENT -->
-<ion-content class="setting-list-container">
+<ion-content 
+  class="setting-list-container"
+  [style.--background]="(backgroundColor$ | async) || '#000000'"
+  [style.color]="getTextColor((backgroundColor$ | async))">
 
-  <ion-list>
-    <ion-item button detail="true" (click)="navigateToAppSettings()">
-      <ion-label>
+  <ion-list [style.background]="(backgroundColor$ | async) || '#000000'">
+    <ion-item 
+      button 
+      detail="true" 
+      (click)="navigateToAppSettings()"
+      [style.--background]="(backgroundColor$ | async) || '#000000'"
+      [style.--color]="getTextColor((backgroundColor$ | async))">
+      <ion-label [style.color]="getTextColor((backgroundColor$ | async))">
         <h2>App Settings</h2>
         <p>Manage your apps, selections, and restrictions</p>
       </ion-label>
     </ion-item>
 
-    <ion-item button detail="true" (click)="navigateToAppLimit()">
-      <ion-label>
+    <ion-item 
+      button 
+      detail="true" 
+      (click)="navigateToAppLimit()"
+      [style.--background]="(backgroundColor$ | async) || '#000000'"
+      [style.--color]="getTextColor((backgroundColor$ | async))">
+      <ion-label [style.color]="getTextColor((backgroundColor$ | async))">
         <h2>App Display Limit</h2>
         <p>Set maximum apps shown on home screen</p>
       </ion-label>
     </ion-item>
 
-    <ion-item button detail="true" (click)="navigateToBackgroundSettings()">
-      <ion-label>
+    <ion-item 
+      button 
+      detail="true" 
+      (click)="navigateToBackgroundSettings()"
+      [style.--background]="(backgroundColor$ | async) || '#000000'"
+      [style.--color]="getTextColor((backgroundColor$ | async))">
+      <ion-label [style.color]="getTextColor((backgroundColor$ | async))">
         <h2>Background Color</h2>
         <p>Customize your home screen background</p>
       </ion-label>

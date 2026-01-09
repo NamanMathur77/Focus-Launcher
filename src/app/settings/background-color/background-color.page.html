@@ -1,18 +1,28 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar 
+    [style.--background]="(backgroundColor$ | async) || '#000000'"
+    [style.--color]="getTextColor((backgroundColor$ | async))">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings"></ion-back-button>
+      <ion-back-button 
+        defaultHref="/settings"
+        [style.color]="getTextColor((backgroundColor$ | async))">
+      </ion-back-button>
     </ion-buttons>
-    <ion-title>Background Color</ion-title>
+    <ion-title [style.color]="getTextColor((backgroundColor$ | async))">Background Color</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
+<ion-content 
+  [style.--background]="(backgroundColor$ | async) || '#000000'"
+  [style.color]="getTextColor((backgroundColor$ | async))">
+  <ion-list [style.background]="(backgroundColor$ | async) || '#000000'">
     <ion-radio-group [value]="selectedColor" (ionChange)="onColorChange($event)">
-      <ion-item *ngFor="let color of colors">
+      <ion-item 
+        *ngFor="let color of colors"
+        [style.--background]="(backgroundColor$ | async) || '#000000'"
+        [style.--color]="getTextColor((backgroundColor$ | async))">
         <div class="color-preview" [style.background-color]="color.value"></div>
-        <ion-label>{{ color.name }}</ion-label>
+        <ion-label [style.color]="getTextColor((backgroundColor$ | async))">{{ color.name }}</ion-label>
         <ion-radio slot="end" [value]="color.value"></ion-radio>
       </ion-item>
     </ion-radio-group>

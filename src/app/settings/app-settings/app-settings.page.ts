@@ -27,8 +27,13 @@ import { Capacitor } from '@capacitor/core';
 export class AppSettingsPage implements OnInit {
 
   installedApps$ = this.appState.installedApps$;
+  backgroundColor$ = this.appState.backgroundColor$;
 
   constructor(private appState: AppState, private router: Router) {}
+
+  getTextColor(backgroundColor: string | null): string {
+    return this.appState.getTextColor(backgroundColor || undefined);
+  }
 
   async ngOnInit() {
     console.log('AppSettingsPage loaded');

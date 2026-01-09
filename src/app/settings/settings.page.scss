@@ -40,10 +40,19 @@ ion-title {
 
 
 ion-content.setting-list-container {
-    --background: #000;
     margin-bottom: 30px;
     --padding-top: calc(56px + var(--ion-safe-area-top));
 }
+
+ion-list {
+  background: transparent;
+}
+
+ion-item {
+  --background: transparent;
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
 ion-item.select-apps-collapse-btn{
     --background: #1A1B21;
     --color: white;

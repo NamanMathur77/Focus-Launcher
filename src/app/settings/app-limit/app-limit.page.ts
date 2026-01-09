@@ -42,6 +42,7 @@ export class AppLimitPage implements OnInit {
   
   selectedLimit: number = 7;
   limitOptions = [3, 5, 7, 10, 15, 20, 25, 30];
+  backgroundColor$ = this.appState.backgroundColor$;
 
   constructor(
     private appState: AppState,
@@ -57,5 +58,9 @@ export class AppLimitPage implements OnInit {
     const limit = event.detail.value;
     this.selectedLimit = limit;
     await this.appState.setSelectionLimit(limit);
+  }
+
+  getTextColor(backgroundColor: string | null): string {
+    return this.appState.getTextColor(backgroundColor || undefined);
   }
 }
