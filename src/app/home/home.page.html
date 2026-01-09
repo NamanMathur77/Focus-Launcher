@@ -21,7 +21,7 @@
   </div>
 
   <!-- App list -->
-  <ion-list *ngIf="apps$ | async as apps">
+  <ion-list *ngIf="apps$ | async as apps" style="padding-bottom: 80px;">
     <ion-item
       button
       *ngFor="let app of apps"

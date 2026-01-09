@@ -10,7 +10,7 @@
   [style.--background]="(backgroundColor$ | async) || '#000000'"
   [style.color]="getTextColor((backgroundColor$ | async))">
   <div *ngIf="notes.length === 0" class="empty-state" [style.color]="getTextColor((backgroundColor$ | async))">
-    <ion-label>No notes yet. Tap + to add your first note.</ion-label>
+    <ion-label>Tap + to add your ideas, notes or whatever floats your boat.</ion-label>
   </div>
 
   <ion-list *ngIf="notes.length > 0">
