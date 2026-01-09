@@ -110,49 +110,89 @@ export class AppDetailsPage implements OnInit {
       return;
     }
 
-    // Unrestricting the app - show time options
+    // Unrestricting the app - show warning first
     event.target.checked = true;
     event.target.disabled = true;
 
+    await this.showUnrestrictWarning(event.target);
+  }
+
+  private async showUnrestrictWarning(toggleElement: any) {
+    let alertDismissed = false;
+    
+    const alert = await this.alertCtrl.create({
+      header: 'Think Before You Unrestrict',
+      message: 'Do you really want to unrestrict this app? Recall why you restricted it in the first place.',
+      backdropDismiss: false,
+      buttons: [
+        {
+          text: 'Undo',
+          role: 'cancel',
+          handler: () => {
+            alertDismissed = true;
+            toggleElement.disabled = false;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+
+    // Auto-dismiss after 15 seconds if user doesn't click undo
+    setTimeout(async () => {
+      if (!alertDismissed) {
+        await alert.dismiss();
+        this.showUnrestrictTimeOptions(toggleElement);
+      }
+    }, 15000);
+
+    const { role } = await alert.onDidDismiss();
+    if (role === 'cancel') {
+      // User clicked undo, don't unrestrict
+      return;
+    }
+  }
+
+  private async showUnrestrictTimeOptions(toggleElement: any) {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'Unrestrict App For',
       buttons: [
         {
           text: '2 Minutes',
           handler: () => {
-            this.unrestrictAppWithTimer(2, event.target);
+            this.unrestrictAppWithTimer(2, toggleElement);
           }
         },
         {
           text: '10 Minutes',
           handler: () => {
-            this.unrestrictAppWithTimer(10, event.target);
+            this.unrestrictAppWithTimer(10, toggleElement);
           }
         },
         {
           text: '20 Minutes',
           handler: () => {
-            this.unrestrictAppWithTimer(15, event.target);
+            this.unrestrictAppWithTimer(20, toggleElement);
           }
         },
         {
           text: '40 Minutes',
           handler: () => {
-            this.unrestrictAppWithTimer(40, event.target);
+            this.unrestrictAppWithTimer(40, toggleElement);
           }
         },
         {
           text: 'Permanently Unrestrict',
           role: 'destructive',
           handler: () => {
-            this.showPermanentUnrestrictConfirmation(event.target);
+            this.showPermanentUnrestrictConfirmation(toggleElement);
           }
         },
         {
           text: 'Cancel',
           role: 'cancel',
           handler: () => {
-            event.target.disabled = false;
+            toggleElement.disabled = false;
           }
         }
       ]
