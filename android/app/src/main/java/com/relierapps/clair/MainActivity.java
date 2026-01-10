@@ -1,4 +1,4 @@
-package com.focuslauncher.app;
+package com.relierapps.clair;
 
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
