@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Clair</string>
     <string name="title_activity_main">Clair</string>
-    <string name="package_name">com.focuslauncher.app</string>
-    <string name="custom_url_scheme">com.focuslauncher.app</string>
+    <string name="package_name">com.relierapps.clair</string>
+    <string name="custom_url_scheme">com.relierapps.clair</string>
 </resources>

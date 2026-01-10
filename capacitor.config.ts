@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.focuslauncher.app',
+  appId: 'com.relierapps.clair',
   appName: 'focus-launcher',
   webDir: 'www'
 };

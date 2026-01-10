@@ -23,6 +23,7 @@ export class HomePage implements OnInit {
   );
   backgroundColor$ = this.appState.backgroundColor$;
   failedToLoadApps = false;
+  isLoading = true;
 
   private touchStartX = 0;
   private touchEndX = 0;
@@ -72,13 +73,17 @@ export class HomePage implements OnInit {
   }
 
   async ngOnInit() {
-    if (Capacitor.getPlatform() === 'web') return;
+    if (Capacitor.getPlatform() === 'web') {
+      this.isLoading = false;
+      return;
+    }
 
     await this.appState.loadInstalledApps();
     await this.appState.loadSelectedApps();
     await this.appState.loadRestrictedApps();
     await this.appState.loadSelectionLimit();
 
+    this.isLoading = false;
     console.log('HomePage loaded');
   }
 

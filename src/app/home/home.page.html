@@ -17,7 +17,8 @@
 
   <!-- Empty state -->
   <div *ngIf="!(apps$ | async)?.length" class="no-apps-container" [style.color]="getTextColor((backgroundColor$ | async))">
-    <ion-label>Please select the apps from settings</ion-label>
+    <ion-label *ngIf="isLoading">Loading your apps...</ion-label>
+    <ion-label *ngIf="!isLoading">Please select the apps from settings</ion-label>
   </div>
 
   <!-- App list -->
