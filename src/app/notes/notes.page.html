@@ -13,8 +13,12 @@
     <ion-label>Tap + to add your ideas, notes or whatever floats your boat.</ion-label>
   </div>
 
-  <ion-list *ngIf="notes.length > 0">
-    <ion-card *ngFor="let note of notes" class="note-card">
+  <ion-list *ngIf="notes.length > 0" [style.background]="(backgroundColor$ | async) || '#000000'">
+    <ion-card 
+      *ngFor="let note of notes" 
+      class="note-card"
+      [style.background]="(backgroundColor$ | async) || '#000000'"
+      [style.border]="'1px solid ' + getTextColor((backgroundColor$ | async))">
       <ion-card-header>
         <ion-card-title [style.color]="getTextColor((backgroundColor$ | async))">{{ note.title }}</ion-card-title>
         <div class="note-date" [style.color]="getTextColor((backgroundColor$ | async))">{{ formatDate(note.updatedAt) }}</div>
@@ -23,7 +27,7 @@
         <p [style.color]="getTextColor((backgroundColor$ | async))">{{ note.content }}</p>
         <div class="note-actions">
           <ion-button fill="clear" size="small" (click)="editNote(note)">
-            <ion-icon slot="icon-only" name="create"></ion-icon>
+            <ion-icon slot="icon-only" name="create" [style.color]="getTextColor((backgroundColor$ | async))"></ion-icon>
           </ion-button>
           <ion-button fill="clear" size="small" color="danger" (click)="deleteNote(note)">
             <ion-icon slot="icon-only" name="trash"></ion-icon>

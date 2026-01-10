@@ -1,5 +1,4 @@
 ion-content {
-  --background: var(--background, #000000);
   --padding-bottom: 80px;
 }
 
@@ -19,9 +18,12 @@ ion-content {
 
 .note-card {
   margin: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   
   ion-card-header {
     padding-bottom: 8px;
+    background: transparent;
     
     ion-card-title {
       font-size: 1.25rem;
@@ -30,12 +32,14 @@ ion-content {
     
     .note-date {
       font-size: 0.75rem;
-      color: var(--ion-color-medium);
+      opacity: 0.7;
       margin-top: 4px;
     }
   }
   
   ion-card-content {
+    background: transparent;
+    
     p {
       white-space: pre-wrap;
       word-wrap: break-word;

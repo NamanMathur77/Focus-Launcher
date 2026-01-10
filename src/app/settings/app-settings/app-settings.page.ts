@@ -5,6 +5,7 @@ import { IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonList, IonLabel
 import { AppState } from '../../services/app-state';
 import { InstalledApp } from '../../native/app-launcher';
 import { Capacitor } from '@capacitor/core';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-app-settings',
@@ -26,7 +27,9 @@ import { Capacitor } from '@capacitor/core';
 })
 export class AppSettingsPage implements OnInit {
 
-  installedApps$ = this.appState.installedApps$;
+  installedApps$ = this.appState.installedApps$.pipe(
+    map(apps => [...apps].sort((a, b) => a.appName.localeCompare(b.appName)))
+  );
   backgroundColor$ = this.appState.backgroundColor$;
 
   constructor(private appState: AppState, private router: Router) {}

@@ -7,6 +7,7 @@ import { AppLauncher, InstalledApp } from '../native/app-launcher';
 import { Preferences } from '@capacitor/preferences';
 import { RouterLinkActive } from "@angular/router";
 import { AppState } from '../services/app-state';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +18,9 @@ import { AppState } from '../services/app-state';
 })
 export class HomePage implements OnInit {
 
-  apps$ = this.appState.visibleApps$;
+  apps$ = this.appState.visibleApps$.pipe(
+    map(apps => [...apps].sort((a, b) => a.appName.localeCompare(b.appName)))
+  );
   backgroundColor$ = this.appState.backgroundColor$;
   failedToLoadApps = false;
 
@@ -74,6 +77,7 @@ export class HomePage implements OnInit {
     await this.appState.loadInstalledApps();
     await this.appState.loadSelectedApps();
     await this.appState.loadRestrictedApps();
+    await this.appState.loadSelectionLimit();
 
     console.log('HomePage loaded');
   }
@@ -105,5 +109,13 @@ export class HomePage implements OnInit {
         console.error('Failed to open app', app.packageName, err);
       }
     })();
+  }
+
+  onLongPress(app: InstalledApp, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.router.navigate(['/settings/app-details', app.packageName]);
   }
 }
