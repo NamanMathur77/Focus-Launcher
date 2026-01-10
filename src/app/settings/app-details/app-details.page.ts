@@ -108,10 +108,33 @@ export class AppDetailsPage implements OnInit {
     const checked = event.detail.checked;
     
     if (checked) {
-      // Restricting the app
-      await this.appState.toggleRestrictedApp(this.packageName, true);
-      // Clear any temporary unrestriction
-      await this.appState.clearTemporaryUnrestriction(this.packageName);
+      // Restricting the app - show confirmation first
+      event.target.checked = false;
+      
+      const alert = await this.alertCtrl.create({
+        header: 'Restrict This App?',
+        message: `Once you restrict this app, it will disappear from your home screen.\n\nThis isn't about punishment — it's about giving your mind fewer places to wander.\n\nYou can undo this later, but each change breaks the calm you're trying to build.\n\nAre you sure you want to continue?`,
+        backdropDismiss: false,
+        buttons: [
+          {
+            text: 'Not now',
+            role: 'cancel',
+            handler: () => {
+              event.target.checked = false;
+            }
+          },
+          {
+            text: "Yes, I'm ready",
+            handler: async () => {
+              event.target.checked = true;
+              await this.appState.toggleRestrictedApp(this.packageName, true);
+              await this.appState.clearTemporaryUnrestriction(this.packageName);
+            }
+          }
+        ]
+      });
+
+      await alert.present();
       return;
     }
 
