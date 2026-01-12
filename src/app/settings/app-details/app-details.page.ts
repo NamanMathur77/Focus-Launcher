@@ -147,11 +147,10 @@ export class AppDetailsPage implements OnInit {
 
   private async showUnrestrictWarning(toggleElement: any) {
     let alertDismissed = false;
-    let countdown = 15;
     
     const alert = await this.alertCtrl.create({
       header: 'Think Before You Unrestrict',
-      message: `Do you really want to unrestrict this app? Recall why you restricted it in the first place.\n\nUnrestricting in ${countdown} seconds...`,
+      message: `Do you really want to unrestrict this app? Recall why you restricted it in the first place.\n\nUnrestricting in 15 seconds...`,
       backdropDismiss: false,
       buttons: [
         {
@@ -167,23 +166,9 @@ export class AppDetailsPage implements OnInit {
 
     await alert.present();
 
-    // Update countdown every second
-    const countdownInterval = setInterval(async () => {
-      countdown--;
-      if (countdown > 0 && !alertDismissed) {
-        const messageEl = document.querySelector('ion-alert .alert-message');
-        if (messageEl) {
-          messageEl.textContent = `Do you really want to unrestrict this app? Recall why you restricted it in the first place.\n\nUnrestricting in ${countdown} seconds...`;
-        }
-      } else {
-        clearInterval(countdownInterval);
-      }
-    }, 1000);
-
     // Auto-dismiss after 15 seconds if user doesn't click undo
     setTimeout(async () => {
       if (!alertDismissed) {
-        clearInterval(countdownInterval);
         await alert.dismiss();
         
         // Show toast message
@@ -201,7 +186,6 @@ export class AppDetailsPage implements OnInit {
 
     const { role } = await alert.onDidDismiss();
     if (role === 'cancel') {
-      clearInterval(countdownInterval);
       // User clicked undo, don't unrestrict
       return;
     }
