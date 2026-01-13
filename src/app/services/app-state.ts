@@ -30,7 +30,24 @@ export class AppState {
 
   /** Apps visible on the home screen: available apps that are selected by the user */
   visibleApps$ = combineLatest([this.availableApps$, this.selectedApps$]).pipe(
-    map(([available, selected]) => available.filter(app => selected.has(app.packageName)))
+    map(([available, selected]) => {
+      // Always include essential apps (Phone, Messages, Camera)
+      const essentialPackages = [
+        'com.android.dialer',           // Phone
+        'com.google.android.dialer',    // Google Phone
+        'com.android.contacts',         // Contacts (often includes dialer)
+        'com.android.mms',              // Messages
+        'com.google.android.apps.messaging', // Google Messages
+        'com.android.camera',           // Camera
+        'com.android.camera2',          // Camera2
+        'com.google.android.GoogleCamera' // Google Camera
+      ];
+      
+      // Filter available apps that are either selected OR essential
+      return available.filter(app => 
+        selected.has(app.packageName) || essentialPackages.includes(app.packageName)
+      );
+    })
   );
 
   selectionLimit$ = this.selectionLimitSubject.asObservable();
@@ -61,10 +78,28 @@ export class AppState {
 
   async loadSelectedApps(){
     const saved = await Preferences.get({ key: 'selectedApps' });
+    const selectedSet = new Set<string>();
+    
     if(saved.value) {
       const arr = JSON.parse(saved.value) as string[];
-      this.selectedAppsSubject.next(new Set<string>(arr || []));
+      arr.forEach(pkg => selectedSet.add(pkg));
     }
+    
+    // Add essential apps to selected apps if they're installed (will be checked when rendering)
+    const essentialPackages = [
+      'com.android.dialer',
+      'com.google.android.dialer',
+      'com.android.contacts',
+      'com.android.mms',
+      'com.google.android.apps.messaging',
+      'com.android.camera',
+      'com.android.camera2',
+      'com.google.android.GoogleCamera'
+    ];
+    
+    essentialPackages.forEach(pkg => selectedSet.add(pkg));
+    
+    this.selectedAppsSubject.next(selectedSet);
   }
 
   async loadRestrictedApps(){
