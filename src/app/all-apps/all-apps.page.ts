@@ -63,4 +63,12 @@ export class AllAppsPage implements OnInit {
       await toast.present();
     }
   }
+
+  onLongPress(app: InstalledApp, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.router.navigate(['/settings/app-details', app.packageName]);
+  }
 }

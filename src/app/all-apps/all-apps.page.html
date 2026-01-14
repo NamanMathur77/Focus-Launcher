@@ -17,6 +17,7 @@
       button
       *ngFor="let app of (availableApps$ | async)"
       (click)="openApp(app)"
+      (contextmenu)="onLongPress(app, $event)"
       [style.--background]="(backgroundColor$ | async) || '#000000'"
       [style.--color]="getTextColor((backgroundColor$ | async))">
       <ion-label [style.color]="getTextColor((backgroundColor$ | async))">
