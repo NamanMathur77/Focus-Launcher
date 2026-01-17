@@ -4,6 +4,15 @@
     [style.--color]="getTextColor((backgroundColor$ | async))">
     <ion-title [style.color]="getTextColor((backgroundColor$ | async))">All Apps</ion-title>
   </ion-toolbar>
+  <ion-toolbar
+    [style.--background]="(backgroundColor$ | async) || '#000000'">
+    <ion-searchbar
+      placeholder="Search apps"
+      (ionInput)="onSearchChange($event)"
+      [style.--background]="(backgroundColor$ | async) || '#000000'"
+      [style.--color]="getTextColor((backgroundColor$ | async))">
+    </ion-searchbar>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content 

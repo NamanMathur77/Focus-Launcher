@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, IonLabel, ToastController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonList, IonItem, IonLabel, IonSearchbar, ToastController } from '@ionic/angular/standalone';
 import { AppState } from '../services/app-state';
 import { InstalledApp, AppLauncher } from '../native/app-launcher';
 import { Capacitor } from '@capacitor/core';
 import { map } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-all-apps',
@@ -20,13 +21,29 @@ import { map } from 'rxjs/operators';
     IonTitle,
     IonList,
     IonItem,
-    IonLabel
+    IonLabel,
+    IonSearchbar
   ]
 })
 export class AllAppsPage implements OnInit {
 
-  availableApps$ = this.appState.availableApps$.pipe(
-    map(apps => [...apps].sort((a, b) => a.appName.localeCompare(b.appName)))
+  private searchTermSubject = new BehaviorSubject<string>('');
+  searchTerm$ = this.searchTermSubject.asObservable();
+
+  availableApps$ = combineLatest([
+    this.appState.availableApps$,
+    this.searchTerm$
+  ]).pipe(
+    map(([apps, searchTerm]) => {
+      const sorted = [...apps].sort((a, b) => a.appName.localeCompare(b.appName));
+      if (!searchTerm || searchTerm.trim() === '') {
+        return sorted;
+      }
+      const lowerSearch = searchTerm.toLowerCase();
+      return sorted.filter(app => 
+        app.appName.toLowerCase().includes(lowerSearch)
+      );
+    })
   );
   backgroundColor$ = this.appState.backgroundColor$;
 
@@ -42,6 +59,11 @@ export class AllAppsPage implements OnInit {
 
   getTextColor(backgroundColor: string | null): string {
     return this.appState.getTextColor(backgroundColor || undefined);
+  }
+
+  onSearchChange(event: any) {
+    const searchTerm = event.target.value || '';
+    this.searchTermSubject.next(searchTerm);
   }
 
   async openApp(app: InstalledApp) {
