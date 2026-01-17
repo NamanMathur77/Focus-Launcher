@@ -150,7 +150,7 @@ export class AppDetailsPage implements OnInit {
     
     const alert = await this.alertCtrl.create({
       header: 'Think Before You Unrestrict',
-      message: 'Do you really want to unrestrict this app? Recall why you restricted it in the first place.',
+      message: `Do you really want to unrestrict this app? Recall why you restricted it in the first place.\n\nUnrestricting in 15 seconds...`,
       backdropDismiss: false,
       buttons: [
         {
@@ -170,6 +170,16 @@ export class AppDetailsPage implements OnInit {
     setTimeout(async () => {
       if (!alertDismissed) {
         await alert.dismiss();
+        
+        // Show toast message
+        const toast = await this.toastCtrl.create({
+          message: 'Please choose the time you want to unrestrict this app for',
+          duration: 2000,
+          position: 'top',
+          color: 'primary'
+        });
+        await toast.present();
+        
         this.showUnrestrictTimeOptions(toggleElement);
       }
     }, 15000);

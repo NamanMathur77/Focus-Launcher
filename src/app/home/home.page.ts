@@ -27,6 +27,8 @@ export class HomePage implements OnInit {
 
   private touchStartX = 0;
   private touchEndX = 0;
+  private touchStartY = 0;
+  private touchEndY = 0;
 
   constructor(
     private appState: AppState, 
@@ -38,21 +40,35 @@ export class HomePage implements OnInit {
   @HostListener('touchstart', ['$event'])
   onTouchStart(event: TouchEvent) {
     this.touchStartX = event.changedTouches[0].screenX;
+    this.touchStartY = event.changedTouches[0].screenY;
   }
 
   @HostListener('touchend', ['$event'])
   onTouchEnd(event: TouchEvent) {
     this.touchEndX = event.changedTouches[0].screenX;
+    this.touchEndY = event.changedTouches[0].screenY;
     this.handleSwipe();
   }
 
   handleSwipe() {
     const swipeThreshold = 100; // Minimum distance for swipe
-    const diff = this.touchStartX - this.touchEndX;
+    const horizontalDiff = this.touchStartX - this.touchEndX;
+    const verticalDiff = this.touchStartY - this.touchEndY;
 
-    // Left swipe (start is greater than end)
-    if (diff > swipeThreshold) {
+    // Left swipe (start X is greater than end X)
+    if (horizontalDiff > swipeThreshold && Math.abs(verticalDiff) < swipeThreshold) {
       this.router.navigate(['/notes']);
+    }
+    
+    // Upward swipe from bottom (start Y is greater than end Y)
+    // Only trigger if swipe starts from bottom 20% of screen
+    const screenHeight = window.innerHeight;
+    const bottomThreshold = screenHeight * 0.8; // Bottom 20% of screen
+    
+    if (verticalDiff > swipeThreshold && 
+        Math.abs(horizontalDiff) < swipeThreshold && 
+        this.touchStartY > bottomThreshold) {
+      this.router.navigate(['/all-apps']);
     }
   }
 

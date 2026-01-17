@@ -36,6 +36,10 @@ export const routes: Routes = [
     loadComponent: () => import('./notes/notes.page').then( m => m.NotesPage)
   },
   {
+    path: 'all-apps',
+    loadComponent: () => import('./all-apps/all-apps.page').then( m => m.AllAppsPage)
+  },
+  {
     path: 'onboarding',
     loadComponent: () => import('./pages/onboarding/onboarding.page').then( m => m.OnboardingPage),
     canActivate: [OnboardingGuard]

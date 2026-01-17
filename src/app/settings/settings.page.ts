@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent, IonList, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { AppState } from '../services/app-state';
+import { Capacitor } from '@capacitor/core';
+import { AppLauncher } from '../native/app-launcher';
 
 @Component({
   selector: 'app-settings',
@@ -39,5 +41,20 @@ export class SettingsPage implements OnInit {
 
   navigateToAppLimit() {
     this.router.navigate(['/settings/app-limit']);
+  }
+
+  async openPhoneSettings() {
+    if (Capacitor.getPlatform() === 'web') {
+      console.warn('Phone settings not available on web');
+      return;
+    }
+
+    try {
+      const intent = await (AppLauncher as any).openApp({ 
+        packageName: 'com.android.settings' 
+      });
+    } catch (error) {
+      console.error('Failed to open phone settings:', error);
+    }
   }
 }
